@@ -1,0 +1,13 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  user_id: 
+  day: 2015-07-05
+  heart_series: 
+  sleep_series: 
+
+two:
+  user_id: 
+  day: 2015-07-05
+  heart_series: 
+  sleep_series: 

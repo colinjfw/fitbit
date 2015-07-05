@@ -1,0 +1,23 @@
+default: &default
+  adapter: postgresql
+  encoding: unicode
+  username: <%= ENV['PG_USER'] %>
+  password: <%= ENV['PG_PASS'] %>
+
+  pool: 5
+
+development:
+  <<: *default
+  database: fitbit_development
+
+test:
+  <<: *default
+  database: fitbit_test
+
+
+production:
+  <<: *default
+  database: fitbit_production
+  username: fitbit
+  password: <%= ENV['FITBIT_DATABASE_PASSWORD'] %>
+  url: <%= ENV['DATABASE_URL'] %>
