@@ -1,4 +1,142 @@
-<h1>Users#show</h1>
-<p>Find me in app/views/users/show.html.erb</p>
+<div class="container-fluid">
+<h1><%= @user.name %></h1>
+<%= link_to 'Delete My Account', user_path(@user), method: :delete %>
 
-<%= @user.name %>
+<div class="date-picker row" style="max-width: 800px; margin: auto">
+	<div class="col-md-4 col-sm-4">
+		<%= params[:date] ? link_to('Yesterday', user_path(@user, date: params[:date].to_date - 1), class: 'btn btn-default center-block') : link_to('Yesterday', user_path(@user, date: Date.today - 1), class: 'btn btn-default center-block') %>
+	</div>
+	<div class="col-md-4 col-sm-4">
+		<%= form_tag(user_path(@user), method: 'get', enforce_utf8: false) do %>
+			<div class="input-group">
+				<%= date_field_tag :date, params[:date], class: 'form-control' %>
+				<span class="input-group-btn">
+					<%= submit_tag "Go", name: nil, class: 'btn btn-default' %>
+				</span>
+			</div>
+		<% end %>
+	</div>
+	<div class="col-md-4 col-sm-4"><%= params[:date] ? link_to('Tomorrow', user_path(@user, date: params[:date].to_date + 1), class: 'btn btn-default center-block') : link_to('Tomorrow', user_path(@user, date: Date.today + 1), class: 'btn btn-default center-block')  %></div>
+</div>
+
+	<br />
+	<br />
+
+<% if @data && @data.sleep && @data.start_time && @data.time_in_bed %>
+	<div class="row">
+		<div class="col-md-2 col-xs-4">
+			<div class="thumbnail" style="background-color: #a8dcff">
+				<h2><%= @user.average_nightly_sleep %></h2>
+				<h5>Average Total Sleep Time</h5>
+			</div>
+		</div>
+		<div class="col-md-2 col-xs-4">
+			<div class="thumbnail" style="background-color: #a8dcff">
+				<h2><%= (@data.time_in_bed.to_f / 60).round(2) %> hours</h2>
+				<h5>Time in Bed</h5>
+			</div>
+		</div>
+		<div class="col-md-2 col-xs-4">
+			<div class="thumbnail" style="background-color: #a8dcff">
+				<h2><%= (@data.minutes_asleep.to_f / 60).round(2) %> hours</h2>
+				<h5>Time Asleep</h5>
+			</div>
+		</div>
+		<div class="col-md-2 col-xs-4">
+			<div class="thumbnail" style="background-color: #a8dcff">
+				<h2><%= @data.start_time.to_time.strftime('%I:%M') %></h2>
+				<h5>Start Time</h5>
+			</div>
+		</div>
+		<div class="col-md-2 col-xs-4">
+			<div class="thumbnail" style="background-color: #a8dcff">
+				<h2><%= @data.efficiency %></h2>
+				<h5>Sleep Efficiency</h5>
+			</div>
+		</div>
+		<div class="col-md-2 col-xs-4">
+			<div class="thumbnail" style="background-color: #a8dcff">
+				<h2><%= @data.minutes_awake %> minutes</h2>
+				<h5>Time Awake</h5>
+			</div>
+		</div>
+	</div>
+
+<div style="width: 100%;overflow: scroll;">
+	<canvas id="timeSeries" height="300" width="1200px"></canvas>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/1.0.2/Chart.min.js"></script>
+<script>
+	var ctx = $("#timeSeries").get(0).getContext("2d");
+	var options = {
+
+		///Boolean - Whether grid lines are shown across the chart
+					scaleShowGridLines : false,
+		//String - Colour of the grid lines
+					scaleGridLineColor : "rgba(0,0,0,.05)",
+		//Number - Width of the grid lines
+					scaleGridLineWidth : 1,
+		//Boolean - Whether to show horizontal lines (except X axis)
+					scaleShowHorizontalLines: true,
+		//Boolean - Whether to show vertical lines (except Y axis)
+					scaleShowVerticalLines: true,
+		//Boolean - Whether the line is curved between points
+					bezierCurve : true,
+		//Number - Tension of the bezier curve between points
+					bezierCurveTension : 0.5,
+		//Boolean - Whether to show a dot for each point
+					pointDot : false,
+		//Number - Radius of each point dot in pixels
+					pointDotRadius : 4,
+		//Number - Pixel width of point dot stroke
+					pointDotStrokeWidth : 1,
+		//Number - amount extra to add to the radius to cater for hit detection outside the drawn point
+					pointHitDetectionRadius : 1,
+		//Boolean - Whether to show a stroke for datasets
+					datasetStroke : true,
+		//Number - Pixel width of dataset stroke
+					datasetStrokeWidth : 5,
+		//Boolean - Whether to fill the dataset with a colour
+					datasetFill : true
+	};
+	var bar_options = {
+		//Boolean - Whether the scale should start at zero, or an order of magnitude down from the lowest value
+		scaleBeginAtZero : true,
+		//Boolean - Whether grid lines are shown across the chart
+		scaleShowGridLines : false,
+		//String - Colour of the grid lines
+		scaleGridLineColor : "rgba(0,0,0,.05)",
+		//Number - Width of the grid lines
+		scaleGridLineWidth : 1,
+		//Boolean - Whether to show horizontal lines (except X axis)
+		scaleShowHorizontalLines: true,
+		//Boolean - Whether to show vertical lines (except Y axis)
+		scaleShowVerticalLines: true,
+		//Boolean - If there is a stroke on each bar
+		barShowStroke : true,
+		//Number - Pixel width of the bar stroke
+		barStrokeWidth : 2,
+		//Number - Spacing between each of the X value sets
+		barValueSpacing : 5,
+		//Number - Spacing between data sets within X values
+		barDatasetSpacing : 1,
+	};
+	var data = {
+		labels: <%=raw @data.minute_data_times %>,
+		datasets: [
+			{ label: 'Movement',
+				data: <%= @data.minute_data_values %>,
+				fillColor: "rgba(0,100,192,0.3)",
+				strokeColor: "rgba(0,100,192,0.1)",
+				pointColor: "rgba(0,100,192,0.3)"
+			}
+		]
+	};
+	var lineChart = new Chart(ctx).Line(data, options);
+</script>
+<% else %>
+	<h1>Don't have sleep data for today</h1>
+<% end %>
+
+</div>

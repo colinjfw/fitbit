@@ -12,6 +12,7 @@ gem 'sdoc',         '~> 0.4.0', group: :doc
 gem 'devise',       '~> 3.5.1'
 gem 'fitbit_oauth2', path: '/Users/ColinWalker/workspace/plugins/gems/fitbit_oauth2'
 gem 'faraday'
+gem 'bootstrap-sass'
 
 group :development, :test do
   gem 'byebug'
@@ -19,5 +20,7 @@ group :development, :test do
   gem 'spring'
   gem 'httplog'
   gem 'require_reloader'
+  gem 'better_errors'
+  gem 'binding_of_caller'
 end
 
