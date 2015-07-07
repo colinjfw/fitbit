@@ -1,5 +1,6 @@
 class UsersController < ApplicationController
   before_action :correct_user
+  rescue_from FitbitOauth2::Errors::Unauthorized, with: :login_again
 
   def show
     @user = User.find(params[:id])
@@ -13,6 +14,11 @@ class UsersController < ApplicationController
 
   def destroy
     User.find(params[:id]).destroy
+    redirect_to root_path
+  end
+
+  def logout
+    logout if session[:user_id] == params[:id]
     redirect_to root_path
   end
 
@@ -37,6 +43,10 @@ class UsersController < ApplicationController
       unless current_user.id == params[:id].to_i
         redirect_to root_path
       end
+    end
+
+    def login_again
+      redirect_to FitbitOauth2::Oauth2.new.authorize_url
     end
 
 end
