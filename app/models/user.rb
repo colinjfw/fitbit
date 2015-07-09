@@ -11,7 +11,7 @@ class User < ActiveRecord::Base
     if data.nil?
       logger.info "About to call GatherData #{start = Time.now ; start}"
       data = GatherData.build(self, date)
-      logger.info "Finished calling GatherData #{start - Time.now}"
+      logger.info "Finished calling GatherData #{Time.now - start}"
       Datum.create!(
         user_id: self.id,
         date: date,
@@ -21,7 +21,7 @@ class User < ActiveRecord::Base
         min_asleep:         data.sleep_info[:min_asleep],
         min_fall_asleep:    data.sleep_info[:min_fall_asleep],
         min_restless:       data.sleep_info[:min_restless],
-        series:             data.main_array_with_analyze,
+        series:             data.main_array,
         heart_rate_zones:   data.heart_zones
       )
     else

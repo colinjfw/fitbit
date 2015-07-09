@@ -1,7 +1,9 @@
 module FitbitData
   include Analyzer
   class GatherData
-    attr_accessor :heart_series, :heart_zones, :sleep_series, :sleep_info, :start_time, :end_time
+    attr_accessor :heart_series, :heart_zones, :sleep_series, :sleep_info,
+                  :start_time, :end_time, :main_array, :data_heart, :data_accel,
+                  :data_time
 
     def initialize(user, date)
       @user         = user
@@ -12,6 +14,10 @@ module FitbitData
       @sleep_info   = {}
       @start_time   = nil
       @end_time     = nil
+      @main_array   = []
+      @data_heart   = []
+      @data_accel   = []
+      @data_time    = []
     end
 
     def call_sleep
@@ -57,59 +63,46 @@ module FitbitData
       Hash[@sleep_series.map{ |a| [ a['dateTime'].to_time.strftime('%H:%M'), a['value'] ] }]
     end
 
-    def main_array
-      main = []
-      @heart_series.each do |val|
-        time  = val['time'].to_time.strftime('%H:%M')
-        hr    = val['value'].to_i
-        move  = sleep_structure[time] ? sleep_structure[time].to_i : 0
-        main << [ time, hr, move ]
-      end
-      main
-    end
-
-    def main_array_with_analyze
-      logger.info 'Building main array'
-      main = []
-      analyzed = analyze
+    def build_main_array
+      Rails.logger.info 'Building main array'
+      analyzed = call_analyzer
       @heart_series.each_with_index do |val, t|
-        time    = val['time'].to_time.strftime('%H:%M')
-        main << [
-          val['time'].to_time.strftime('%H:%M'),
-          val['value'],
-          sleep_structure[time] ? sleep_structure[time] : 0,
-          analyzed[:stages][t],
-          analyzed[:moving_average][t],
-          analyzed[:fixed_average][t],
-          analyzed[:moving_volatility][t]
+        @main_array << [
+          @data_time[t],                   # time
+          @data_heart[t],                  # heart rate
+          @data_accel[t],                  # accel data
+          analyzed[:stages][t],            # stages
+          analyzed[:moving_average][t],    # moving average
+          analyzed[:fixed_average][t],     # fixed average
+          analyzed[:moving_volatility][t]  # moving vol
         ]
       end
-      main
+      Rails.logger.info 'Finished building main array'
     end
 
-    def data_accel
-      main_array.map{|a| a[2].to_i }
+    def build_data_values
+      @heart_series.each_with_index do |val, t|
+        time = val['time'].to_time.strftime('%H:%M')
+        @data_time << time
+        @data_heart << val['value']
+        @data_accel << sleep_structure[time] ? sleep_structure[time] : 0
+      end
     end
 
-    def data_heart
-      main_array.map{|a| a[1].to_i }
-    end
-
-    def analyze
-      logger.info 'Calling HrData analyze from gather data'
-      data = Analyzer::HrData.analyze(heart: data_heart, accel: data_accel)
-      {
-        moving_average: data.moving_average,
-        fixed_average: data.fixed_average,
-        moving_volatility: data.moving_volatility,
-        stages: data.stage
-      }
+    def call_analyzer
+      Rails.logger.info 'Calling HrData analyze from gather data'
+      data = Analyzer::HrData.analyze_data(heart: data_heart, accel: data_accel)
+      Rails.logger.info 'Finished calling HrData analyze from gather data'
+      { moving_average: data.moving_average, fixed_average: data.fixed_average,
+        moving_volatility: data.moving_volatility, stages: data.stage }
     end
 
     def self.build(user, date)
       build = self.new(user, date)
       build.call_sleep
       build.call_heart
+      build.build_data_values
+      build.build_main_array
       build
     end
 

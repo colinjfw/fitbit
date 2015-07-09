@@ -3,6 +3,7 @@ class UsersController < ApplicationController
   rescue_from Oauth2Rails::Errors::Unauthorized, with: :login_again
 
   def show
+    logger.info 'test go to show'
     @user = User.find(params[:id])
     if params[:date]
       data = @user.get_data(params[:date])

@@ -38,8 +38,8 @@ module Analyzer
       heart.each_with_index { |datum, t| hr_vol << heart.volatility }
       hr_vol
     end
-    def self.analyze(options = {})
-      logger.info 'Calling HrData'
+    def self.analyze_data(options = {})
+      Rails.logger.info 'Calling HrData'
       data = self.new(options)
       Analyze.new(data).analyze
     end
@@ -84,7 +84,7 @@ module Analyzer
       vol && avg && acc # && var
     end
     def analyze
-      logger.info 'Analyzing in HrData'
+      Rails.logger.info 'Analyzing in HrData'
       stages = []
       heart.each_with_index do |datum, t|
         if    rem?(t)     ; stages << 4
