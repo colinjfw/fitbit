@@ -1,5 +1,5 @@
 module FitbitData
-  class FitbitData
+  class GatherData
     attr_accessor :heart_series, :heart_zones, :sleep_series, :sleep_info, :start_time, :end_time
 
     def initialize(user, date)
@@ -37,11 +37,11 @@ module FitbitData
 
     def call_heart
       if @start_time < @date
-        heart1 = self.fitbit.minute_heart(1,1,@date,strf_start,'23:59').json_body
-        heart2 = self.fitbit.minute_heart(1,1,@date.to_date + 1,'00:00',strf_end).json_body
+        heart1 = @user.fitbit.minute_heart(1,1,@date,strf_start,'23:59').json_body
+        heart2 = @user.fitbit.minute_heart(1,1,@date.to_date + 1,'00:00',strf_end).json_body
         @heart_series = heart1['activities-heart-intraday']['dataset'] + heart2['activities-heart-intraday']['dataset']
       else
-        heart1 = self.fitbit.minute_heart(1,1,@date,strf_start,strf_end).json_body
+        heart1 = @user.fitbit.minute_heart(1,1,@date,strf_start,strf_end).json_body
         @heart_series = heart1
       end
       hzone = heart1['activities-heart'][0]['heartRateZones']
@@ -65,9 +65,10 @@ module FitbitData
       end
     end
 
-    def build
+    def self.build
       call_sleep
       call_heart
+      GatherData
     end
 
   end
