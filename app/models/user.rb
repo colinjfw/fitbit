@@ -5,39 +5,29 @@ class User < ActiveRecord::Base
     Oauth2Rails::Fitbit.new(self, options)
   end
 
-  def process_heart_data(json1, json2)
-    values1 = json1['activities-heart-intraday']['dataset']
-    values2 = json2['activities-heart-intraday']['dataset']
-    values = values1 +  values2
-    data = {
-      info: {
-        interval: json1['activities-heart-intraday']['datasetInterval'],
-        interval_type: json1['activities-heart-intraday']['datasetType'],
-        start_date: json1['activities-heart'][0]['dateTime'],
-        start_time: json1['activities-heart-intraday']['dataset'][0].values[0],
-        end_time:   json2['activities-heart-intraday']['dataset'].last.values[0]
-      },
-      dataset: values
-    }
-    data.to_json
-  end
-
   def get_data(date)
     data = self.data.find_by(date: date)
     if data.nil?
-      heart1 = self.fitbit.minute_heart(1,1,date,'22:00','23:59').json_body
-      heart2 = self.fitbit.minute_heart(1,1,date.to_date + 1,'00:00','10:00').json_body
-      values1 = heart1['activities-heart-intraday']['dataset']
-      values2 = heart2['activities-heart-intraday']['dataset']
-      heart_series = values1 + values2
-
       fitbit_sleep = self.fitbit.sleep(date).json_body
       fitbit_sleep['sleep'] ? sleep_series = fitbit_sleep['sleep'][0] : sleep_series = {}
 
+      heart1 = self.fitbit.minute_heart(1,1,date,'22:00','23:59').json_body               # todo only call this if necessary
+      heart2 = self.fitbit.minute_heart(1,1,date.to_date + 1,'00:00','10:00').json_body
+      values1 = heart1['activities-heart-intraday']['dataset']
+      values2 = heart2['activities-heart-intraday']['dataset']
+      heart_series_init = values1 + values2
+
+      heart_struc = Hash[heart_series_init.each_with_index.map{ |a,i| [a['time'].to_time.strftime('%I:%M'), i] }]
+      sleep_struc = Hash[sleep_series.map{ |a,i| [a['dateTime'].to_time.strftime('%I:%M'), a['value']] }]
+
+      first_index = heart_struc[sleep_series['startTime'].to_time.strftime('%I:%M')]
+      last_index = heart_struc[sleep_series.last['dateTime'].to_time.strftime('%I:%M')]
+
+      heart_series = heart_series_init[first_index..last_index]
+
       main_array = []
       heart_series.each do |point|
-        sleep_val = sleep_series['minuteData'].find { |time| time['dateTime'].to_time.strftime('%I:%M') == point['time'].to_time.strftime('%I:%M') }
-        main_array << [ point['time'], point['value'], sleep_val['value'] ]
+        main_array << [ point['time'], point['value'], sleep_struc[point['time'].to_time.strftime('%I:%M')]  ]
       end
       main_array
 
