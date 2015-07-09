@@ -20,9 +20,7 @@ module Analyzer
     end
     def moving_volatility
       hr_vol = []
-      heart.each_with_index do |datum, t|
-        hr_vol << moving(t).volatility
-      end
+      heart.each_with_index { |datum, t| hr_vol << moving(t).volatility }
       hr_vol
     end
     def moving_average
@@ -39,6 +37,10 @@ module Analyzer
       hr_vol = []
       heart.each_with_index { |datum, t| hr_vol << heart.volatility }
       hr_vol
+    end
+    def self.analyze(options = {})
+      data = self.new(options)
+      Analyze.new(data).analyze
     end
   end
 

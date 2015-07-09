@@ -1,4 +1,5 @@
 module FitbitData
+  include Analyzer
   class GatherData
     attr_accessor :heart_series, :heart_zones, :sleep_series, :sleep_info, :start_time, :end_time
 
@@ -59,14 +60,49 @@ module FitbitData
     def main_array
       main = []
       @heart_series.each do |val|
-        time = val['time'].to_time.strftime('%H:%M')
-        move = sleep_structure[time]
-        main << [ time, val['value'].to_i, move ? move.to_i : 0  ]
+        time  = val['time'].to_time.strftime('%H:%M')
+        hr    = val['value'].to_i
+        move  = sleep_structure[time] ? sleep_structure[time].to_i : 0
+        main << [ time, hr, move ]
       end
       main
     end
 
+    def main_array_with_analyze
+      main = []
+      analyzed = analyze
+      @heart_series.each_with_index do |val, t|
+        time    = val['time'].to_time.strftime('%H:%M')
+        main << [
+          val['time'].to_time.strftime('%H:%M'),                    # time
+          val['value'].to_i,                                        # heart rate
+          sleep_structure[time] ? sleep_structure[time].to_i : 0,   # accel data
+          analyzed[:stages][t],                                     # stages
+          analyzed[:moving_average][t],                             # moving average
+          analyzed[:fixed_average][t],                              # fixed average
+          analyzed[:moving_volatility][t]                           # moving volatility
+        ]
+      end
+      main
+    end
 
+    def data_accel
+      main_array.map{|a| a[2].to_i }
+    end
+
+    def data_heart
+      main_array.map{|a| a[1].to_i }
+    end
+
+    def analyze
+      data = HrData.analyze(heart: data_heart, accel: data_accel)
+      {
+        moving_average: data.moving_average,
+        fixed_average: data.fixed_average,
+        moving_volatility: data.moving_volatility,
+        stages: data.stage
+      }
+    end
 
     def self.build(user, date)
       build = self.new(user, date)
