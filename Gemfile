@@ -13,6 +13,7 @@ gem 'devise',       '~> 3.5.1'
 gem 'oauth2_rails', path: '/Users/ColinWalker/workspace/plugins/gems/oauth2_rails'
 gem 'faraday'
 gem 'bootstrap-sass'
+gem 'stat_sugar'
 
 group :development, :test do
   gem 'byebug'

@@ -11,7 +11,6 @@ module Analyzer
   class HrData
     include MovingAverage
     attr_accessor :heart, :accel, :stage, :inter, :start
-
     def initialize(options = {})
       @heart = options[:heart] || []
       @accel = options[:accel] || []
@@ -19,7 +18,6 @@ module Analyzer
       @inter = options[:inter] || '1s'
       @start = options[:start] || nil
     end
-
     def moving_volatility
       hr_vol = []
       heart.each_with_index do |datum, t|
@@ -27,61 +25,21 @@ module Analyzer
       end
       hr_vol
     end
-
     def moving_average
       hr_avg = []
-      heart.each_with_index do |datum, t|
-        hr_avg << moving(t).average
-      end
+      heart.each_with_index { |datum, t| ; hr_avg << moving(t).average }
       hr_avg
     end
-
     def fixed_average
       hr_avg = []
-      heart.each_with_index do |datum, t|
-        hr_avg << heart.average
-      end
+      heart.each_with_index { |datum, t| ; hr_avg << heart.average }
       hr_avg
     end
-
     def fixed_volatility
       hr_vol = []
-      heart.each_with_index do |datum, t|
-        hr_vol << heart.volatility
-      end
+      heart.each_with_index { |datum, t| hr_vol << heart.volatility }
       hr_vol
     end
-
-    def graph
-      puts ' '
-      puts ' '
-      heart.each do |datum|
-        puts '-' * datum
-      end
-      puts ' '
-    end
-
-    def table
-      puts ' '
-      puts ' '
-      puts '         OVERALL                '
-      puts "     Average: #{heart.average.round(2)}   "
-      puts "  Volatility: #{heart.volatility.round(2)}"
-      puts "    Variance: #{heart.variance.round(2)}"
-      puts ' '
-      puts '|       |       |  mov  |  mov  |  mov  |  mov  |  mov  |       |'
-      puts '|   t   |   hr  |  avg  |  vol  |  var  |avg-avg|vol-vol| stage |'
-      puts '|-------|-------|-------|-------|-------|-------|-------|-------|'
-      heart.each_with_index do |datum, t|
-        pad = 7
-        mov = moving(t)
-        avg_diff = mov.average - heart.average
-        vol_diff = mov.volatility - heart.volatility
-        puts "| #{t.pad(pad,1)} | #{datum.pad(pad,1)} | #{mov.average.pad(pad,1)} | #{mov.volatility.pad(pad,1)} | #{mov.variance.pad(pad,1)} | #{avg_diff >= 0 ? avg_diff.pad(pad,1).green : avg_diff.pad(pad,1).red } | #{vol_diff >= 0 ? vol_diff.pad(pad,1).green : vol_diff.pad(pad,1).red } | #{stage[t].pad(pad,1)} |"
-      end
-      return nil
-    end
-
   end
 
   class Analyze
@@ -92,59 +50,48 @@ module Analyzer
       @heart = data_object.heart
       @accel = data_object.accel
     end
-
     def rem?(t)
       mov = moving(t)
       mov.average > heart.average ? avg = true : avg = false
       mov.volatility > heart.volatility ? vol = true : vol = false
-      mov.variance > heart.variance ? var = true : var = false
-      vol && avg
+      accel[t] > 1 ? acc = true : acc = false
+      # mov.variance > heart.variance ? var = true : var = false
+      vol && avg && acc # && var
     end
-
     def deep?(t)
       mov = moving(t)
       mov.average < heart.average ? avg = true : avg = false
       mov.volatility < heart.volatility ? vol = true : vol = false
-      mov.variance < heart.variance ? var = true : var = false
-      vol && avg
+      # mov.variance < heart.variance ? var = true : var = false
+      vol && avg # && var
     end
-
     def medium?(t)
       mov = moving(t)
       mov.average.approx_equal?(heart.average) ? avg = true : avg = false
       mov.volatility.approx_equal?(heart.volatility) ? vol = true : vol = false
-      mov.variance.approx_equal?(heart.variance) ? var = true : var = false
-      vol && avg
+      # mov.variance.approx_equal?(heart.variance) ? var = true : var = false
+      vol && avg # && var
     end
-
     def light?(t)
       mov = moving(t)
       mov.average > heart.average ? avg = true : avg = false
       mov.volatility.approx_equal?(heart.volatility) ? vol = true : vol = false
-      mov.variance > heart.variance ? var = true : var = false
-      vol && avg
+      accel[t] > 1 ? acc = true : acc = false
+      # mov.variance > heart.variance ? var = true : var = false
+      vol && avg && acc # && var
     end
-
-    # KEYS => 1: light, 2: medium, 3: deep, 4: REM
     def analyze
       stages = []
       heart.each_with_index do |datum, t|
-        if rem?(t)
-          stages << 40
-        elsif deep?(t)
-          stages << 30
-        elsif medium?(t)
-          stages << 20
-        elsif light?(t)
-          stages << 10
-        else
-          stages << 0
+        if    rem?(t)     ; stages << 4
+        elsif deep?(t)    ; stages << 3
+        elsif medium?(t)  ; stages << 2
+        elsif light?(t)   ; stages << 1
+        else              ; stages << 0
         end
       end
-      @dat_o.stage = stages
-      return @dat_o
+      @dat_o.stage = stages ; @dat_o
     end
-
   end
 
 end

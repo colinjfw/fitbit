@@ -66,6 +66,8 @@ module FitbitData
       main
     end
 
+
+
     def self.build(user, date)
       build = self.new(user, date)
       build.call_sleep
