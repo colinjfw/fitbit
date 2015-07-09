@@ -18,11 +18,14 @@ ActiveRecord::Schema.define(version: 20150705213152) do
 
   create_table "data", force: :cascade do |t|
     t.integer  "user_id"
-    t.date     "day"
-    t.json     "heart_series"
-    t.json     "sleep_series"
-    t.datetime "created_at",   null: false
-    t.datetime "updated_at",   null: false
+    t.date     "date"
+    t.time     "start_time"
+    t.text     "series",                   array: true
+    t.time     "time_in_bed"
+    t.time     "time_awake"
+    t.time     "time_asleep"
+    t.datetime "created_at",  null: false
+    t.datetime "updated_at",  null: false
   end
 
   add_index "data", ["user_id"], name: "index_data_on_user_id", using: :btree
@@ -36,6 +39,10 @@ ActiveRecord::Schema.define(version: 20150705213152) do
     t.datetime "created_at",    null: false
     t.datetime "updated_at",    null: false
   end
+
+  add_index "users", ["access_token"], name: "index_users_on_access_token", using: :btree
+  add_index "users", ["refresh_token"], name: "index_users_on_refresh_token", using: :btree
+  add_index "users", ["uid"], name: "index_users_on_uid", using: :btree
 
   add_foreign_key "data", "users"
 end
