@@ -74,13 +74,13 @@ module FitbitData
       @heart_series.each_with_index do |val, t|
         time    = val['time'].to_time.strftime('%H:%M')
         main << [
-          val['time'].to_time.strftime('%H:%M'),                    # time
-          val['value'].to_i,                                        # heart rate
-          sleep_structure[time] ? sleep_structure[time].to_i : 0,   # accel data
-          analyzed[:stages][t],                                     # stages
-          analyzed[:moving_average][t],                             # moving average
-          analyzed[:fixed_average][t],                              # fixed average
-          analyzed[:moving_volatility][t]                           # moving volatility
+          val['time'].to_time.strftime('%H:%M'),
+          val['value'].to_i,
+          sleep_structure[time] ? sleep_structure[time].to_i : 0,
+          analyzed[:stages][t],
+          analyzed[:moving_average][t],
+          analyzed[:fixed_average][t],
+          analyzed[:moving_volatility][t]
         ]
       end
       main
