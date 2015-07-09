@@ -55,10 +55,10 @@ module Analyzer
     def rem?(t)
       mov = moving(t)
       mov.average > heart.average ? avg = true : avg = false
-      mov.volatility > heart.volatility ? vol = true : vol = false
-      accel[t] > 1 ? acc = true : acc = false
+      # mov.volatility > heart.volatility ? vol = true : vol = false
+      # accel[t] > 1 ? acc = true : acc = false
       # mov.variance > heart.variance ? var = true : var = false
-      vol && avg && acc # && var
+      avg
     end
     def deep?(t)
       mov = moving(t)
