@@ -9,7 +9,9 @@ class User < ActiveRecord::Base
   def get_data(date)
     data = self.data.find_by(date: date)
     if data.nil?
+      logger.info "About to call GatherData #{start = Time.now ; start}"
       data = GatherData.build(self, date)
+      logger.info "Finished calling GatherData #{start - Time.now}"
       Datum.create!(
         user_id: self.id,
         date: date,

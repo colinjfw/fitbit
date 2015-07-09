@@ -69,6 +69,7 @@ module FitbitData
     end
 
     def main_array_with_analyze
+      logger.info 'Building main array'
       main = []
       analyzed = analyze
       @heart_series.each_with_index do |val, t|
@@ -95,6 +96,7 @@ module FitbitData
     end
 
     def analyze
+      logger.info 'Calling HrData analyze from gather data'
       data = Analyzer::HrData.analyze(heart: data_heart, accel: data_accel)
       {
         moving_average: data.moving_average,

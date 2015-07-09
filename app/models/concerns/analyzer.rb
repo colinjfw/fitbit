@@ -39,6 +39,7 @@ module Analyzer
       hr_vol
     end
     def self.analyze(options = {})
+      logger.info 'Calling HrData'
       data = self.new(options)
       Analyze.new(data).analyze
     end
@@ -83,6 +84,7 @@ module Analyzer
       vol && avg && acc # && var
     end
     def analyze
+      logger.info 'Analyzing in HrData'
       stages = []
       heart.each_with_index do |datum, t|
         if    rem?(t)     ; stages << 4
