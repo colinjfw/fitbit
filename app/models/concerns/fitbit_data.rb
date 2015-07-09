@@ -90,12 +90,13 @@ module FitbitData
 
     def build_data_values
       Rails.logger.info 'BUILDING DATA VALUES'
+      structure = sleep_structure
       @heart_series.each_with_index do |val, t|
         Rails.logger.info "#{t} inside data values"
         time = val['time'].to_time.strftime('%H:%M')
         @data_time << time
         @data_heart << val['value']
-        @data_accel << sleep_structure[time] ? sleep_structure[time].to_i : 0
+        @data_accel << structure[time] ? structure[time].to_i : 0
       end
       Rails.logger.info 'Finished data values'
     end

@@ -14,6 +14,17 @@ class UsersController < ApplicationController
     end
   end
 
+  def chart
+    logger.info params
+    @user = User.first #.find(params[:id])
+    begin
+      @data = @user.get_data(Date.today - 1)
+    rescue FitbitData::NoDataError
+      @data = false
+    end
+    render layout: false
+  end
+
   def destroy
     User.find(params[:id]).destroy
     redirect_to root_path

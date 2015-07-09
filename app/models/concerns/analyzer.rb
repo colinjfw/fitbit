@@ -52,14 +52,19 @@ module Analyzer
       @dat_o = data_object
       @heart = data_object.heart
       @accel = data_object.accel
+      @sample_size = @heart.size
     end
     def rem?(t)
-      mov = moving(t)
-      mov.average > heart.average ? avg = true : avg = false
-      # mov.volatility > heart.volatility ? vol = true : vol = false
-      # accel[t] > 1 ? acc = true : acc = false
-      # mov.variance > heart.variance ? var = true : var = false
-      avg
+      if t < @sample_size * 0.20 || t > @sample_size * 0.10
+        mov = moving(t)
+        mov.average > heart.average ? avg = true : avg = false
+        # mov.volatility > heart.volatility ? vol = true : vol = false
+        # accel[t] > 1 ? acc = true : acc = false
+        # mov.variance > heart.variance ? var = true : var = false
+        avg
+      else
+        false
+      end
     end
     def deep?(t)
       mov = moving(t)
@@ -87,6 +92,7 @@ module Analyzer
       Rails.logger.info 'Analyzing in HrData'
       stages = []
       heart.each_with_index do |datum, t|
+        Rails.logger.info "#{t} Analyzing sleep"
         if    rem?(t)     ; stages << 4
         elsif deep?(t)    ; stages << 3
         elsif medium?(t)  ; stages << 2
