@@ -20,14 +20,19 @@ ActiveRecord::Schema.define(version: 20150705213152) do
     t.integer  "user_id"
     t.date     "date"
     t.time     "start_time"
-    t.text     "series",                   array: true
-    t.time     "time_in_bed"
-    t.time     "time_awake"
-    t.time     "time_asleep"
-    t.datetime "created_at",  null: false
-    t.datetime "updated_at",  null: false
+    t.text     "series",                        array: true
+    t.integer  "min_in_bed"
+    t.integer  "min_awake"
+    t.integer  "min_asleep"
+    t.integer  "min_fall_asleep"
+    t.integer  "min_restless"
+    t.integer  "awakening_count"
+    t.json     "heart_rate_zones"
+    t.datetime "created_at",       null: false
+    t.datetime "updated_at",       null: false
   end
 
+  add_index "data", ["date"], name: "index_data_on_date", using: :btree
   add_index "data", ["user_id"], name: "index_data_on_user_id", using: :btree
 
   create_table "users", force: :cascade do |t|

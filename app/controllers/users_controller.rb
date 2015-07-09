@@ -24,7 +24,11 @@ class UsersController < ApplicationController
 
   private
     def correct_user
-      unless current_user.id == params[:id].to_i
+      if current_user
+        unless current_user.id == params[:id].to_i
+          redirect_to root_path
+        end
+      else
         redirect_to root_path
       end
     end

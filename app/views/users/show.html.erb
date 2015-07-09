@@ -27,7 +27,7 @@
 	<br />
 	<br />
 
-<% if @data && @data.sleep && @data.start_time && @data.time_in_bed %>
+<% if @data && @data.series && @data.start_time && @data.time_in_bed %>
 	<div class="row">
 		<div class="col-md-2 col-xs-4">
 			<div class="thumbnail" style="background-color: #a8dcff">
@@ -37,31 +37,31 @@
 		</div>
 		<div class="col-md-2 col-xs-4">
 			<div class="thumbnail" style="background-color: #a8dcff">
-				<h2 style="text-align: center;"><%= @data.start_time.to_time.strftime('%I:%M') %></h2>
+				<h2 style="text-align: center;"><%= @data.start_time %></h2>
 				<h5>Start Time</h5>
 			</div>
 		</div>
 		<div class="col-md-2 col-xs-4">
 			<div class="thumbnail" style="background-color: #a8dcff">
-				<h2 style="text-align: center;"><%= (@data.time_in_bed.to_f / 60).round(2) %>h</h2>
+				<h2 style="text-align: center;"><%= @data.time_in_bed %>h</h2>
 				<h5>Time in Bed</h5>
 			</div>
 		</div>
 		<div class="col-md-2 col-xs-4">
 			<div class="thumbnail" style="background-color: #a8dcff">
-				<h2 style="text-align: center;"><%= (@data.minutes_asleep.to_f / 60).round(2) %>h</h2>
+				<h2 style="text-align: center;"><%= @data.time_asleep %>h</h2>
 				<h5>Time Asleep</h5>
 			</div>
 		</div>
 		<div class="col-md-2 col-xs-4">
 			<div class="thumbnail" style="background-color: #a8dcff">
-				<h2 style="text-align: center;"><%= @data.efficiency %></h2>
+				<h2 style="text-align: center;"><%= @data.time_asleep / @data.time_in_bed %></h2>
 				<h5>Sleep Efficiency</h5>
 			</div>
 		</div>
 		<div class="col-md-2 col-xs-4">
 			<div class="thumbnail" style="background-color: #a8dcff">
-				<h2 style="text-align: center;"><%= @data.minutes_awake %>min</h2>
+				<h2 style="text-align: center;"><%= @data.time_awake %>min</h2>
 				<h5>Time Awake</h5>
 			</div>
 		</div>
@@ -104,10 +104,16 @@
 			barDatasetSpacing : 1,
 		};
 		var data = {
-			labels: <%=raw @data.minute_data_times %>,
+			labels: <%=raw @data.data_time.map{ |a| a if a % 20 == 0 } %>,
 			datasets: [
 				{ label: 'Movement',
-					data: <%= @data.minute_data_values %>,
+					data: <%= @data.data_accel %>,
+					fillColor: "rgba(0,100,192,0.3)",
+					strokeColor: "rgba(0,100,192,0.1)",
+					pointColor: "rgba(0,100,192,0.3)"
+				},
+				{ label: 'Heart Rate',
+					data: <%= @data.data_heart %>,
 					fillColor: "rgba(0,100,192,0.3)",
 					strokeColor: "rgba(0,100,192,0.1)",
 					pointColor: "rgba(0,100,192,0.3)"
@@ -119,7 +125,7 @@
 	});
 </script>
 
-		<%= @data.main_data %>
+		<%= @data.series %>
 
 <% else %>
 	<h1>Don't have sleep data for today</h1>
