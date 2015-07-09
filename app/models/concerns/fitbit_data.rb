@@ -74,6 +74,7 @@ module FitbitData
       Rails.logger.info 'Building main array'
       analyzed = call_analyzer
       @heart_series.each_with_index do |val, t|
+        Rails.logger.info "#{t} inside main array"
         @main_array << [
           @data_time[t],                   # time
           @data_heart[t],                  # heart rate
