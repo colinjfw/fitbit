@@ -36,44 +36,52 @@
 			</script>
 		</div>
 
-
 		<div id="chartDiv"></div>
-
-		<script>
-			var chartData={
-				"type": "line",
-				"scale-y":{
-					values:"0:120:10"
-				},
-				"plotarea":{
-					"background-color":"#fff"
-				},
-				"series": series
-			};
-
-			window.onload=function(){
-				zingchart.render({
-					id:'chartDiv',
-					height:500,
-					width:"100%",
-					data:chartData
-				});
-			};
-		</script>
-
-
-		<script>
-
-			$.ajax({
-					url: "/users/chart",
-					data: {id: '<%= @user.id %>', date: '<%= params[:date] %>'},
-					cache: false,
-					success: function(html){
-						$("#chart").append(html);
-						$("#loader").remove();
-						$("#oldSeries").remove();
-					}
-			});
-		</script>
-
 </div>
+
+	<script>
+		$( document ).ready(function() {
+				console.log( "ready!" );
+				var ajax = $.ajax({
+						url: "/users/chart",
+						data: {id: '<%= @user.id %>', date: '<%= params[:date] %>'},
+						cache: true,
+						success: function (html) {
+							console.log( "success" );
+						},
+						error: function () {
+							console.log( "error" );
+						},
+						complete: function (html) {
+							console.log( "complete" );
+							$("#loader").remove();
+						}
+				});
+		});
+		$( document ).ajaxComplete(function( event, xhr, settings ) {
+			console.log(xhr.responseText);
+			$("#chart").append(xhr.responseText);
+			zingchart.exec('chartDiv', 'appendseriesdata', { data: newSeries })
+		});
+
+		var chartData={
+			"type": "line",
+			"scale-y":{
+				values:"0:120:10"
+			},
+			"plotarea":{
+				"background-color":"#fff"
+			},
+			"series": series
+		};
+
+		window.onload=function(){
+			zingchart.render({
+				id:'chartDiv',
+				height:500,
+				width:"100%",
+				data:chartData
+			});
+		};
+
+	</script>

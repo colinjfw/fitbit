@@ -40,7 +40,7 @@
 <hr>
 
 <script>
-	var series = [
+	var newSeries = [
 			{ "values": <%=raw @data.data_heart %> },
 			{ "values": <%=raw @data.data_accel %> },
 			{ "values": <%=raw @data.data_stages %> },
@@ -48,7 +48,6 @@
 			{ "values": <%=raw @data.data_fixed_average %> },
 			{ "values": <%=raw @data.data_moving_volatility %> }
 	]
-	zingchart.exec('chartDiv', 'appendseriesdata', { data: series });
 </script>
 <% else %>
 <h1 style="text-align: center;">No Data Available</h1>
