@@ -79,7 +79,7 @@ module Analyzer
       mov = moving(t)
       mov.average > heart.average ? avg = true : avg = false
       mov.volatility.approx_equal?(heart.volatility) ? vol = true : vol = false
-      accel[t] > 1 ? acc = true : acc = false
+      accel[t].to_i > 1 ? acc = true : acc = false
       # mov.variance > heart.variance ? var = true : var = false
       vol && avg && acc # && var
     end

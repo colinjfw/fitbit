@@ -6,9 +6,10 @@ class UsersController < ApplicationController
     logger.info 'test go to show'
     @user = User.find(params[:id])
     if params[:date]
-      data = @user.get_data(params[:date])
-      if data
-        @data = data
+      begin
+        @data = @user.get_data(params[:date])
+      rescue FitbitData::NoDataError
+        @data = false
       end
     end
   end

@@ -21,17 +21,22 @@ module FitbitData
     end
 
     def call_sleep
+      Rails.logger.info 'CALL SLEEP'
       sleep = @user.fitbit.sleep(@date).json_body
-      @sleep_series = sleep['sleep'][0]['minuteData']
-      sleep_info    = sleep['sleep'][0]
-      @sleep_info = {
-        min_in_bed: sleep_info['timeInBed'].to_i,
-        min_awake: sleep_info['minutesAwake'].to_i,
-        min_asleep: sleep_info['minutesAsleep'].to_i,
-        min_fall_asleep: sleep_info['minutesToFallAsleep'].to_i,
-      }
-      @start_time = Time.parse("#{@date} #{sleep_info['startTime'].to_time.strftime('%H:%M')}")
-      @end_time   = Time.parse("#{@date} #{@sleep_series.last['dateTime']}")
+      if sleep['sleep'][0]
+        @sleep_series = sleep['sleep'][0]['minuteData']
+        sleep_info    = sleep['sleep'][0]
+        @sleep_info = {
+          min_in_bed: sleep_info['timeInBed'].to_i,
+          min_awake: sleep_info['minutesAwake'].to_i,
+          min_asleep: sleep_info['minutesAsleep'].to_i,
+          min_fall_asleep: sleep_info['minutesToFallAsleep'].to_i,
+        }
+        @start_time = Time.parse("#{@date} #{sleep_info['startTime'].to_time.strftime('%H:%M')}")
+        @end_time   = Time.parse("#{@date} #{@sleep_series.last['dateTime']}")
+      else
+        raise NoDataError, 'Could not find any sleep data'
+      end
     end
 
     def strf_start
@@ -43,6 +48,7 @@ module FitbitData
     end
 
     def call_heart
+      Rails.logger.info 'CALL HEART'
       if @start_time < '00:00'
         heart1 = @user.fitbit.minute_heart(1,1,@date,strf_start,'23:59').json_body
         heart2 = @user.fitbit.minute_heart(1,1,@date.to_date + 1,'00:00',strf_end).json_body
@@ -52,6 +58,7 @@ module FitbitData
         @heart_series = heart1['activities-heart-intraday']['dataset']
       end
       hzone = heart1['activities-heart'][0]['heartRateZones']
+      Rails.logger.info 'FINISH CALL HEART'
       @heart_zones = {
         fat_burn: { max: hzone[1]['max'], min: hzone[1]['min'] },
         cardio:   { max: hzone[2]['max'], min: hzone[2]['min'] },
@@ -81,12 +88,15 @@ module FitbitData
     end
 
     def build_data_values
+      Rails.logger.info 'BUILDING DATA VALUES'
       @heart_series.each_with_index do |val, t|
+        Rails.logger.info "#{t} inside data values"
         time = val['time'].to_time.strftime('%H:%M')
         @data_time << time
         @data_heart << val['value']
-        @data_accel << sleep_structure[time] ? sleep_structure[time] : 0
+        @data_accel << sleep_structure[time] ? sleep_structure[time].to_i : 0
       end
+      Rails.logger.info 'Finished data values'
     end
 
     def call_analyzer
@@ -107,4 +117,8 @@ module FitbitData
     end
 
   end
+
+  class NoDataError < StandardError
+  end
+
 end
