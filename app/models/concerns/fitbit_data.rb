@@ -42,7 +42,7 @@ module FitbitData
         @heart_series = heart1['activities-heart-intraday']['dataset'] + heart2['activities-heart-intraday']['dataset']
       else
         heart1 = @user.fitbit.minute_heart(1,1,@date,strf_start,strf_end).json_body
-        @heart_series = heart1
+        @heart_series = heart1['activities-heart-intraday']['dataset']
       end
       hzone = heart1['activities-heart'][0]['heartRateZones']
       @heart_zones = {
@@ -63,12 +63,14 @@ module FitbitData
         move = sleep_structure[time]
         main << [ time, val['value'].to_i, move ? move.to_i : 0  ]
       end
+      main
     end
 
-    def self.build
-      call_sleep
-      call_heart
-      GatherData
+    def self.build(user, date)
+      build = self.new(user, date)
+      build.call_sleep
+      build.call_heart
+      build
     end
 
   end

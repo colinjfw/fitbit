@@ -1,111 +1,105 @@
 <div class="container-fluid">
-<h1><%= @user.name %></h1>
-<%= link_to 'Log Out', "/logout/#{@user.id}", method: :post %> | <%= link_to 'Delete My Account', user_path(@user), method: :delete, confirm: 'This will delete all of your account information from our database.' %>
+	<h1><%= @user.name %></h1>
+	<%= link_to 'Log Out', "/logout/#{@user.id}", method: :post %> |
+	<%= link_to 'Delete My Account', user_path(@user), method: :delete, confirm: 'This will delete all of your account information from our database.' %>
 
-
-<div class="date-picker row" style="max-width: 800px; margin: auto">
-	<div class="col-md-4 col-sm-4">
-		<%= params[:date] ? link_to('Yesterday', user_path(@user, date: params[:date].to_date - 1), class: 'btn btn-default center-block') : link_to('Yesterday', user_path(@user, date: Date.today - 1), class: 'btn btn-default center-block') %>
-	</div>
-	<div class="col-md-4 col-sm-4">
-		<%= form_tag(user_path(@user), method: 'get', enforce_utf8: false) do %>
-			<div class="input-group">
-				<%= date_field_tag :date, params[:date], class: 'form-control' %>
-				<span class="input-group-btn">
-					<%= submit_tag "Go", name: nil, class: 'btn btn-default' %>
-				</span>
+		<div class="date-picker row" style="max-width: 800px; margin: auto">
+			<div class="col-md-4 col-sm-4">
+				<%= params[:date] ? link_to('Yesterday', user_path(@user, date: params[:date].to_date - 1), class: 'btn btn-default center-block') : link_to('Yesterday', user_path(@user, date: Date.today - 1), class: 'btn btn-default center-block') %>
 			</div>
-		<% end %>
-		<h3 class="center-block" style="text-align: center;"><%= params[:date] ? params[:date].to_date.strftime('%A %B %-d'): 'Select a date' %></h3>
+			<div class="col-md-4 col-sm-4">
+				<%= form_tag(user_path(@user), method: 'get', enforce_utf8: false) do %>
+					<div class="input-group">
+						<%= date_field_tag :date, params[:date], class: 'form-control' %>
+						<span class="input-group-btn">
+							<%= submit_tag "Go", name: nil, class: 'btn btn-default' %>
+						</span>
+					</div>
+				<% end %>
+				<h3 class="center-block" style="text-align: center;"><%= params[:date] ? params[:date].to_date.strftime('%A %B %-d'): 'Select a date' %></h3>
 
-		<h6 style="text-align: center;">(the day you woke up on)</h6>
-		<h5 style="text-align: center;"><%= link_to 'Today', user_path(@user, date: Date.today) %></h5>
-	</div>
-	<div class="col-md-4 col-sm-4"><%= params[:date] ? link_to('Tomorrow', user_path(@user, date: params[:date].to_date + 1), class: 'btn btn-default center-block') : link_to('Tomorrow', user_path(@user, date: Date.today + 1), class: 'btn btn-default center-block')  %></div>
-</div>
-
-	<br />
-	<br />
-
-<% if @data && @data.series && @data.start_time && @data.min_in_bed %>
-	<div class="row">
-		<div class="col-md-2 col-xs-4">
-			<div class="thumbnail" style="background-color: #a8dcff">
-				<h2 style="text-align: center;">//</h2>
-				<h5>Average Sleep</h5>
+				<h6 style="text-align: center;">(the day you woke up on)</h6>
+				<h5 style="text-align: center;"><%= link_to 'Today', user_path(@user, date: Date.today) %></h5>
 			</div>
+			<div class="col-md-4 col-sm-4"><%= params[:date] ? link_to('Tomorrow', user_path(@user, date: params[:date].to_date + 1), class: 'btn btn-default center-block') : link_to('Tomorrow', user_path(@user, date: Date.today + 1), class: 'btn btn-default center-block')  %></div>
 		</div>
-		<div class="col-md-2 col-xs-4">
-			<div class="thumbnail" style="background-color: #a8dcff">
-				<h2 style="text-align: center;"><%= @data.start_time.strftime('%I:%M') %></h2>
-				<h5>Start Time</h5>
-			</div>
-		</div>
-		<div class="col-md-2 col-xs-4">
-			<div class="thumbnail" style="background-color: #a8dcff">
-				<h2 style="text-align: center;"><%= @data.min_in_bed %>h</h2>
-				<h5>Time in Bed</h5>
-			</div>
-		</div>
-		<div class="col-md-2 col-xs-4">
-			<div class="thumbnail" style="background-color: #a8dcff">
-				<h2 style="text-align: center;"><%= @data.min_asleep %>h</h2>
-				<h5>Time Asleep</h5>
-			</div>
-		</div>
-		<div class="col-md-2 col-xs-4">
-			<div class="thumbnail" style="background-color: #a8dcff">
-				<h2 style="text-align: center;"><%= @data.min_asleep / @data.min_in_bed %></h2>
-				<h5>Sleep Efficiency</h5>
-			</div>
-		</div>
-		<div class="col-md-2 col-xs-4">
-			<div class="thumbnail" style="background-color: #a8dcff">
-				<h2 style="text-align: center;"><%= @data.min_restless %>min</h2>
-				<h5>Time Awake</h5>
-			</div>
-		</div>
-	</div>
-<hr>
 
-		<script type="text/javascript" src="https://www.google.com/jsapi"></script>
-		<script type="text/javascript">
-			google.load("visualization", "1", {packages:["corechart"]});
-			google.setOnLoadCallback(drawChart);
-			function drawChart() {
-				var data = google.visualization.arrayToDataTable(
-					<%=raw @data.series.unshift(['date', 'Heart Rate', 'Movement']) %>
-				);
-				var options = {
-					title: 'Leads',
-					hAxis: {showTextEvery: 5},
-					vAxes: {0: {viewWindowMode:'explicit',
-						viewWindow:{
-							max:510,
-							min:82
-						},
-						gridlines: {color: 'transparent'},
-					},
-						1: {gridlines: {color: 'transparent'},
-							format:"#%"},
-					},
-					series: {0: {targetAxisIndex:0},
-						1:{targetAxisIndex:0},
-						2:{targetAxisIndex:1},
-					},
-					colors: ["red", "green", "orange"],
-					chartArea:{left:100,top:100, width:500, height:150},
-				};
+		<br />
+		<br />
 
-				var chart = new google.visualization.LineChart(document.getElementById('chart_id'));
-				chart.draw(data, options);
-			}
+		<% if @data && @data.series && @data.start_time && @data.min_in_bed %>
+			<div class="row">
+				<div class="col-md-2 col-xs-4">
+					<div class="thumbnail" style="background-color: #a8dcff">
+						<h2 style="text-align: center;">//</h2>
+						<h5>Average Sleep</h5>
+					</div>
+				</div>
+				<div class="col-md-2 col-xs-4">
+					<div class="thumbnail" style="background-color: #a8dcff">
+						<h2 style="text-align: center;"><%= @data.start_time.strftime('%I:%M') %></h2>
+						<h5>Start Time</h5>
+					</div>
+				</div>
+				<div class="col-md-2 col-xs-4">
+					<div class="thumbnail" style="background-color: #a8dcff">
+						<h2 style="text-align: center;"><%= @data.min_in_bed %>h</h2>
+						<h5>Time in Bed</h5>
+					</div>
+				</div>
+				<div class="col-md-2 col-xs-4">
+					<div class="thumbnail" style="background-color: #a8dcff">
+						<h2 style="text-align: center;"><%= @data.min_asleep %>h</h2>
+						<h5>Time Asleep</h5>
+					</div>
+				</div>
+				<div class="col-md-2 col-xs-4">
+					<div class="thumbnail" style="background-color: #a8dcff">
+						<h2 style="text-align: center;"><%= @data.min_asleep / @data.min_in_bed %></h2>
+						<h5>Sleep Efficiency</h5>
+					</div>
+				</div>
+				<div class="col-md-2 col-xs-4">
+					<div class="thumbnail" style="background-color: #a8dcff">
+						<h2 style="text-align: center;"><%= @data.min_restless %>min</h2>
+						<h5>Time Awake</h5>
+					</div>
+				</div>
+			</div>
+		<hr>
+
+		<div id="chartDiv"></div>
+
+		<script>
+			var chartData={
+				"type": "line",
+				"scale-y":{
+					values:"0:100:10"
+				},
+				"scale-y-2":{
+					"values":["Still","Moving","Awake"],
+				},
+				"plotarea":{
+					"background-color":"#fff"
+				},
+				"series": [
+					{ "values": <%=raw @data.data_heart %> },
+					{ "values": <%=raw @data.data_accel %> }
+				]
+			};
+
+			window.onload=function(){
+				zingchart.render({
+					id:'chartDiv',
+					height:500,
+					width:"100%",
+					data:chartData
+				});
+			};
 		</script>
 
-		<div id="chart_id" style="width: 800px; height: 300px;"></div>
-
-<% else %>
-	<h1>Don't have sleep data for today</h1>
-<% end %>
+	<% else %>
+		<h1>Don't have sleep data for today</h1>
+	<% end %>
 
 </div>

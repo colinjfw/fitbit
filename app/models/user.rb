@@ -9,7 +9,7 @@ class User < ActiveRecord::Base
   def get_data(date)
     data = self.data.find_by(date: date)
     if data.nil?
-      data = GatherData.new(self,date).build
+      data = GatherData.build(self, date)
       Datum.create!(
         user_id: self.id,
         date: date,
