@@ -6,7 +6,7 @@ class UsersController < ApplicationController
     @user = User.find(params[:id])
     if params[:date]
       data = @user.get_data(params[:date])
-      if data.sleep
+      if data
         @data = data
       end
     end

@@ -27,105 +27,82 @@
 	<br />
 	<br />
 
-<% if @data && @data.series && @data.start_time && @data.time_in_bed %>
+<% if @data && @data.series && @data.start_time && @data.min_in_bed %>
 	<div class="row">
 		<div class="col-md-2 col-xs-4">
 			<div class="thumbnail" style="background-color: #a8dcff">
-				<h2 style="text-align: center;"><%= @user.average_nightly_sleep %>h</h2>
+				<h2 style="text-align: center;">//</h2>
 				<h5>Average Sleep</h5>
 			</div>
 		</div>
 		<div class="col-md-2 col-xs-4">
 			<div class="thumbnail" style="background-color: #a8dcff">
-				<h2 style="text-align: center;"><%= @data.start_time %></h2>
+				<h2 style="text-align: center;"><%= @data.start_time.strftime('%I:%M') %></h2>
 				<h5>Start Time</h5>
 			</div>
 		</div>
 		<div class="col-md-2 col-xs-4">
 			<div class="thumbnail" style="background-color: #a8dcff">
-				<h2 style="text-align: center;"><%= @data.time_in_bed %>h</h2>
+				<h2 style="text-align: center;"><%= @data.min_in_bed %>h</h2>
 				<h5>Time in Bed</h5>
 			</div>
 		</div>
 		<div class="col-md-2 col-xs-4">
 			<div class="thumbnail" style="background-color: #a8dcff">
-				<h2 style="text-align: center;"><%= @data.time_asleep %>h</h2>
+				<h2 style="text-align: center;"><%= @data.min_asleep %>h</h2>
 				<h5>Time Asleep</h5>
 			</div>
 		</div>
 		<div class="col-md-2 col-xs-4">
 			<div class="thumbnail" style="background-color: #a8dcff">
-				<h2 style="text-align: center;"><%= @data.time_asleep / @data.time_in_bed %></h2>
+				<h2 style="text-align: center;"><%= @data.min_asleep / @data.min_in_bed %></h2>
 				<h5>Sleep Efficiency</h5>
 			</div>
 		</div>
 		<div class="col-md-2 col-xs-4">
 			<div class="thumbnail" style="background-color: #a8dcff">
-				<h2 style="text-align: center;"><%= @data.time_awake %>min</h2>
+				<h2 style="text-align: center;"><%= @data.min_restless %>min</h2>
 				<h5>Time Awake</h5>
 			</div>
 		</div>
 	</div>
 <hr>
-<div style="width: 100%; max-width: 1000px; overflow: scroll; margin: auto">
-	<canvas id="timeSeries" height="600" width="1000"></canvas>
-</div>
 
-<script>
-	$( document ).ready(function() {
-		var ctx = $("#timeSeries").get(0).getContext("2d");
-		var options = {
-			scaleShowGridLines : false,
-			scaleGridLineColor : "rgba(0,0,0,.05)",
-			scaleGridLineWidth : 1,
-			scaleShowHorizontalLines: true,
-			scaleShowVerticalLines: true,
-			bezierCurve : true,
-			bezierCurveTension : 0.5,
-			pointDot : false,
-			pointDotRadius : 4,
-			pointDotStrokeWidth : 1,
-			pointHitDetectionRadius : 1,
-			datasetStroke : true,
-			datasetStrokeWidth : 5,
-			datasetFill : true,
-			responsive: true
-		};
-		var bar_options = {
-			scaleBeginAtZero : true,
-			scaleShowGridLines : false,
-			scaleGridLineColor : "rgba(0,0,0,.05)",
-			scaleGridLineWidth : 1,
-			scaleShowHorizontalLines: true,
-			scaleShowVerticalLines: true,
-			barShowStroke : true,
-			barStrokeWidth : 2,
-			barValueSpacing : 5,
-			barDatasetSpacing : 1,
-		};
-		var data = {
-			labels: <%=raw @data.data_time.map{ |a| a if a % 20 == 0 } %>,
-			datasets: [
-				{ label: 'Movement',
-					data: <%= @data.data_accel %>,
-					fillColor: "rgba(0,100,192,0.3)",
-					strokeColor: "rgba(0,100,192,0.1)",
-					pointColor: "rgba(0,100,192,0.3)"
-				},
-				{ label: 'Heart Rate',
-					data: <%= @data.data_heart %>,
-					fillColor: "rgba(0,100,192,0.3)",
-					strokeColor: "rgba(0,100,192,0.1)",
-					pointColor: "rgba(0,100,192,0.3)"
-				}
-			]
-		};
-		var lineChart = new Chart(ctx).Line(data, options);
-		console.log( "ready!" );
-	});
-</script>
+		<script type="text/javascript" src="https://www.google.com/jsapi"></script>
+		<script type="text/javascript">
+			google.load("visualization", "1", {packages:["corechart"]});
+			google.setOnLoadCallback(drawChart);
+			function drawChart() {
+				var data = google.visualization.arrayToDataTable(
+					<%=raw @data.series.unshift(['date', 'Heart Rate', 'Movement']) %>
+				);
+				var options = {
+					title: 'Leads',
+					hAxis: {showTextEvery: 5},
+					vAxes: {0: {viewWindowMode:'explicit',
+						viewWindow:{
+							max:510,
+							min:82
+						},
+						gridlines: {color: 'transparent'},
+					},
+						1: {gridlines: {color: 'transparent'},
+							format:"#%"},
+					},
+					series: {0: {targetAxisIndex:0},
+						1:{targetAxisIndex:0},
+						2:{targetAxisIndex:1},
+					},
+					colors: ["red", "green", "orange"],
+					chartArea:{left:100,top:100, width:500, height:150},
+				};
 
-		<%= @data.series %>
+				var chart = new google.visualization.LineChart(document.getElementById('chart_id'));
+				chart.draw(data, options);
+			}
+		</script>
+
+		<div id="chart_id" style="width: 800px; height: 300px;"></div>
 
 <% else %>
 	<h1>Don't have sleep data for today</h1>
