@@ -1,4 +1,7 @@
-<h1>Home#index</h1>
-<p>Find me in app/views/home/index.html.erb</p>
 
-<%= link_to 'sign in with fitbit', FitbitOauth2::Oauth2.new.authorize_url %>
+<div class="header" style="height: 600px">
+	<h1 style="text-align: center; padding-top: 4em">Sleep Cycles for FitBit</h1>
+	<div style="width: 200px; margin: auto">
+		<%= link_to 'sign in with fitbit', Oauth2Rails::Auth.new.authorize_url, class: 'btn btn-lg btn-primary center-block' %>
+	</div>
+</div>

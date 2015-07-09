@@ -1,6 +1,6 @@
 class Oauth2CallbacksController < ApplicationController
   def fitbit
-    fitbit_user = FitbitOauth2::Oauth2.new.get_token(params[:code])
+    fitbit_user = Oauth2Rails::Auth.new.get_token(params[:code])
     user = User.find_by(uid: fitbit_user.id)
     if user
       user.update!(
@@ -9,7 +9,7 @@ class Oauth2CallbacksController < ApplicationController
         name:           fitbit_user.full_name
       )
     else
-      user.create!(
+      user = User.create!(
         refresh_token:  fitbit_user.refresh_token,
         access_token:   fitbit_user.access_token,
         name:           fitbit_user.full_name

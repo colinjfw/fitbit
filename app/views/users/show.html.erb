@@ -1,8 +1,6 @@
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/1.0.2/Chart.min.js"></script>
-
 <div class="container-fluid">
 <h1><%= @user.name %></h1>
-<%= link_to 'Log Out', "/logout/#{@user.id}", method: :post %> | <%= link_to 'Delete My Account', user_path(@user), method: :delete %>
+<%= link_to 'Log Out', "/logout/#{@user.id}", method: :post %> | <%= link_to 'Delete My Account', user_path(@user), method: :delete, confirm: 'This will delete all of your account information from our database.' %>
 
 
 <div class="date-picker row" style="max-width: 800px; margin: auto">
@@ -31,20 +29,8 @@
 	<div class="row">
 		<div class="col-md-2 col-xs-4">
 			<div class="thumbnail" style="background-color: #a8dcff">
-				<h2 style="text-align: center;"><%= @user.average_nightly_sleep %></h2>
-				<h5>Average Total Sleep Time</h5>
-			</div>
-		</div>
-		<div class="col-md-2 col-xs-4">
-			<div class="thumbnail" style="background-color: #a8dcff">
-				<h2 style="text-align: center;"><%= (@data.time_in_bed.to_f / 60).round(2) %> hours</h2>
-				<h5>Time in Bed</h5>
-			</div>
-		</div>
-		<div class="col-md-2 col-xs-4">
-			<div class="thumbnail" style="background-color: #a8dcff">
-				<h2 style="text-align: center;"><%= (@data.minutes_asleep.to_f / 60).round(2) %> hours</h2>
-				<h5>Time Asleep</h5>
+				<h2 style="text-align: center;"><%= @user.average_nightly_sleep %>h</h2>
+				<h5>Average Sleep</h5>
 			</div>
 		</div>
 		<div class="col-md-2 col-xs-4">
@@ -55,76 +41,64 @@
 		</div>
 		<div class="col-md-2 col-xs-4">
 			<div class="thumbnail" style="background-color: #a8dcff">
+				<h2 style="text-align: center;"><%= (@data.time_in_bed.to_f / 60).round(2) %>h</h2>
+				<h5>Time in Bed</h5>
+			</div>
+		</div>
+		<div class="col-md-2 col-xs-4">
+			<div class="thumbnail" style="background-color: #a8dcff">
+				<h2 style="text-align: center;"><%= (@data.minutes_asleep.to_f / 60).round(2) %>h</h2>
+				<h5>Time Asleep</h5>
+			</div>
+		</div>
+		<div class="col-md-2 col-xs-4">
+			<div class="thumbnail" style="background-color: #a8dcff">
 				<h2 style="text-align: center;"><%= @data.efficiency %></h2>
 				<h5>Sleep Efficiency</h5>
 			</div>
 		</div>
 		<div class="col-md-2 col-xs-4">
 			<div class="thumbnail" style="background-color: #a8dcff">
-				<h2 style="text-align: center;"><%= @data.minutes_awake %> min</h2>
+				<h2 style="text-align: center;"><%= @data.minutes_awake %>min</h2>
 				<h5>Time Awake</h5>
 			</div>
 		</div>
 	</div>
 <hr>
 <div style="width: 100%; max-width: 1000px; overflow: scroll; margin: auto">
-	<canvas id="timeSeries" height="300" width="1000"></canvas>
+	<canvas id="timeSeries" height="600" width="1000"></canvas>
 </div>
 
 <script>
 	$( document ).ready(function() {
 		var ctx = $("#timeSeries").get(0).getContext("2d");
 		var options = {
-
-			///Boolean - Whether grid lines are shown across the chart
-						scaleShowGridLines : false,
-			//String - Colour of the grid lines
-						scaleGridLineColor : "rgba(0,0,0,.05)",
-			//Number - Width of the grid lines
-						scaleGridLineWidth : 1,
-			//Boolean - Whether to show horizontal lines (except X axis)
-						scaleShowHorizontalLines: true,
-			//Boolean - Whether to show vertical lines (except Y axis)
-						scaleShowVerticalLines: true,
-			//Boolean - Whether the line is curved between points
-						bezierCurve : true,
-			//Number - Tension of the bezier curve between points
-						bezierCurveTension : 0.5,
-			//Boolean - Whether to show a dot for each point
-						pointDot : false,
-			//Number - Radius of each point dot in pixels
-						pointDotRadius : 4,
-			//Number - Pixel width of point dot stroke
-						pointDotStrokeWidth : 1,
-			//Number - amount extra to add to the radius to cater for hit detection outside the drawn point
-						pointHitDetectionRadius : 1,
-			//Boolean - Whether to show a stroke for datasets
-						datasetStroke : true,
-			//Number - Pixel width of dataset stroke
-						datasetStrokeWidth : 5,
-			//Boolean - Whether to fill the dataset with a colour
-						datasetFill : true
+			scaleShowGridLines : false,
+			scaleGridLineColor : "rgba(0,0,0,.05)",
+			scaleGridLineWidth : 1,
+			scaleShowHorizontalLines: true,
+			scaleShowVerticalLines: true,
+			bezierCurve : true,
+			bezierCurveTension : 0.5,
+			pointDot : false,
+			pointDotRadius : 4,
+			pointDotStrokeWidth : 1,
+			pointHitDetectionRadius : 1,
+			datasetStroke : true,
+			datasetStrokeWidth : 5,
+			datasetFill : true,
+			responsive: true
 		};
 		var bar_options = {
-			//Boolean - Whether the scale should start at zero, or an order of magnitude down from the lowest value
 			scaleBeginAtZero : true,
-			//Boolean - Whether grid lines are shown across the chart
 			scaleShowGridLines : false,
-			//String - Colour of the grid lines
 			scaleGridLineColor : "rgba(0,0,0,.05)",
-			//Number - Width of the grid lines
 			scaleGridLineWidth : 1,
-			//Boolean - Whether to show horizontal lines (except X axis)
 			scaleShowHorizontalLines: true,
-			//Boolean - Whether to show vertical lines (except Y axis)
 			scaleShowVerticalLines: true,
-			//Boolean - If there is a stroke on each bar
 			barShowStroke : true,
-			//Number - Pixel width of the bar stroke
 			barStrokeWidth : 2,
-			//Number - Spacing between each of the X value sets
 			barValueSpacing : 5,
-			//Number - Spacing between data sets within X values
 			barDatasetSpacing : 1,
 		};
 		var data = {

@@ -122,16 +122,16 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module-library">
-      <library name="fitbit_oauth2 (v0.1.0, /Users/ColinWalker/workspace/plugins/gems/fitbit_oauth2) [path][gem]">
+      <library name="oauth2_rails (v0.1.0, /Users/ColinWalker/workspace/plugins/gems/oauth2_rails) [path][gem]">
         <CLASSES>
-          <root url="file://$MODULE_DIR$/../../plugins/gems/fitbit_oauth2/bin" />
-          <root url="file://$MODULE_DIR$/../../plugins/gems/fitbit_oauth2/lib" />
-          <root url="file://$MODULE_DIR$/../../plugins/gems/fitbit_oauth2/.idea" />
+          <root url="file://$MODULE_DIR$/../../plugins/gems/oauth2_rails/bin" />
+          <root url="file://$MODULE_DIR$/../../plugins/gems/oauth2_rails/lib" />
+          <root url="file://$MODULE_DIR$/../../plugins/gems/oauth2_rails/.idea" />
         </CLASSES>
         <SOURCES>
-          <root url="file://$MODULE_DIR$/../../plugins/gems/fitbit_oauth2/bin" />
-          <root url="file://$MODULE_DIR$/../../plugins/gems/fitbit_oauth2/lib" />
-          <root url="file://$MODULE_DIR$/../../plugins/gems/fitbit_oauth2/.idea" />
+          <root url="file://$MODULE_DIR$/../../plugins/gems/oauth2_rails/bin" />
+          <root url="file://$MODULE_DIR$/../../plugins/gems/oauth2_rails/lib" />
+          <root url="file://$MODULE_DIR$/../../plugins/gems/oauth2_rails/.idea" />
         </SOURCES>
       </library>
     </orderEntry>
@@ -143,9 +143,11 @@
     <orderEntry type="library" scope="PROVIDED" name="activerecord (v4.2.3, rbenv: 2.2.1) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="activesupport (v4.2.3, rbenv: 2.2.1) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="arel (v6.0.0, rbenv: 2.2.1) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="autoprefixer-rails (v5.2.1, rbenv: 2.2.1) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="bcrypt (v3.1.10, rbenv: 2.2.1) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="better_errors (v2.1.1, rbenv: 2.2.1) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="binding_of_caller (v0.7.2, rbenv: 2.2.1) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="bootstrap-sass (v3.3.5.1, rbenv: 2.2.1) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="builder (v3.2.2, rbenv: 2.2.1) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="bundler (v1.8.5, rbenv: 2.2.1) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="byebug (v5.0.0, rbenv: 2.2.1) [gem]" level="application" />
@@ -160,6 +162,7 @@
     <orderEntry type="library" scope="PROVIDED" name="execjs (v2.5.2, rbenv: 2.2.1) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="faraday (v0.9.1, rbenv: 2.2.1) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="globalid (v0.3.5, rbenv: 2.2.1) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="httplog (v0.2.10, rbenv: 2.2.1) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="i18n (v0.7.0, rbenv: 2.2.1) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="jbuilder (v2.3.0, rbenv: 2.2.1) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="jquery-rails (v4.0.4, rbenv: 2.2.1) [gem]" level="application" />

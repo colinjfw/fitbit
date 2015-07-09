@@ -1,7 +1,7 @@
 PATH
-  remote: /Users/ColinWalker/workspace/plugins/gems/fitbit_oauth2
+  remote: /Users/ColinWalker/workspace/plugins/gems/oauth2_rails
   specs:
-    fitbit_oauth2 (0.1.0)
+    oauth2_rails (0.1.0)
       faraday (>= 0.7.0)
 
 GEM
@@ -183,10 +183,10 @@ DEPENDENCIES
   coffee-rails (~> 4.1.0)
   devise (~> 3.5.1)
   faraday
-  fitbit_oauth2!
   httplog
   jbuilder (~> 2.0)
   jquery-rails
+  oauth2_rails!
   pg
   rails (= 4.2.3)
   require_reloader

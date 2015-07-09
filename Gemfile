@@ -10,7 +10,7 @@ gem 'turbolinks'
 gem 'jbuilder',     '~> 2.0'
 gem 'sdoc',         '~> 0.4.0', group: :doc
 gem 'devise',       '~> 3.5.1'
-gem 'fitbit_oauth2', path: '/Users/ColinWalker/workspace/plugins/gems/fitbit_oauth2'
+gem 'oauth2_rails', path: '/Users/ColinWalker/workspace/plugins/gems/oauth2_rails'
 gem 'faraday'
 gem 'bootstrap-sass'
 
