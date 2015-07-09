@@ -19,7 +19,7 @@ class User < ActiveRecord::Base
         min_asleep:         data.sleep_info[:min_asleep],
         min_fall_asleep:    data.sleep_info[:min_fall_asleep],
         min_restless:       data.sleep_info[:min_restless],
-        series:             data.main_array,
+        series:             data.main_array_with_analyze,
         heart_rate_zones:   data.heart_zones
       )
     else

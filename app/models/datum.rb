@@ -15,15 +15,15 @@ class Datum < ActiveRecord::Base
   end
 
   def data_heart
-    series.map{|a| a[1] }
+    series.map{|a| a[1].to_i }
   end
 
   def data_accel
-    series.map{|a| a[2] * 50 - 50 }
+    series.map{|a| a[2].to_i * 20 - 20 }
   end
 
   def data_stages
-    series.map{|a| a[3] }
+    series.map{|a| a[3].to_i * 20 - 20 }
   end
 
   def data_mov_average
@@ -35,7 +35,7 @@ class Datum < ActiveRecord::Base
   end
 
   def data_moving_volatility
-    series.map{|a| a[6].to_i }
+    series.map{|a| a[6].to_i + 100 }
   end
 
 end

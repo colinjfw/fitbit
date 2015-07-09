@@ -37,7 +37,7 @@ module FitbitData
     end
 
     def call_heart
-      if @start_time < @date
+      if @start_time < '00:00'
         heart1 = @user.fitbit.minute_heart(1,1,@date,strf_start,'23:59').json_body
         heart2 = @user.fitbit.minute_heart(1,1,@date.to_date + 1,'00:00',strf_end).json_body
         @heart_series = heart1['activities-heart-intraday']['dataset'] + heart2['activities-heart-intraday']['dataset']
@@ -75,8 +75,8 @@ module FitbitData
         time    = val['time'].to_time.strftime('%H:%M')
         main << [
           val['time'].to_time.strftime('%H:%M'),
-          val['value'].to_i,
-          sleep_structure[time] ? sleep_structure[time].to_i : 0,
+          val['value'],
+          sleep_structure[time] ? sleep_structure[time] : 0,
           analyzed[:stages][t],
           analyzed[:moving_average][t],
           analyzed[:fixed_average][t],
@@ -95,7 +95,7 @@ module FitbitData
     end
 
     def analyze
-      data = HrData.analyze(heart: data_heart, accel: data_accel)
+      data = Analyzer::HrData.analyze(heart: data_heart, accel: data_accel)
       {
         moving_average: data.moving_average,
         fixed_average: data.fixed_average,
