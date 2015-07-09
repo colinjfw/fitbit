@@ -16,7 +16,9 @@
 				</span>
 			</div>
 		<% end %>
-		<h3 class="center-block" style="text-align: center;"><%= params[:date] ? params[:date].to_date.strftime('%A %B %-d') : 'Select a date' %></h3>
+		<h3 class="center-block" style="text-align: center;"><%= params[:date] ? params[:date].to_date.strftime('%A %B %-d'): 'Select a date' %></h3>
+
+		<h6 style="text-align: center;">(the day you woke up on)</h6>
 		<h5 style="text-align: center;"><%= link_to 'Today', user_path(@user, date: Date.today) %></h5>
 	</div>
 	<div class="col-md-4 col-sm-4"><%= params[:date] ? link_to('Tomorrow', user_path(@user, date: params[:date].to_date + 1), class: 'btn btn-default center-block') : link_to('Tomorrow', user_path(@user, date: Date.today + 1), class: 'btn btn-default center-block')  %></div>
@@ -117,8 +119,7 @@
 	});
 </script>
 
-
-		<%= @data.heart_series['dataset'].size %>
+		<%= @data.main_data %>
 
 <% else %>
 	<h1>Don't have sleep data for today</h1>

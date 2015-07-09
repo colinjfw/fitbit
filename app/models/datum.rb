@@ -5,6 +5,14 @@ class Datum < ActiveRecord::Base
     sleep_series['sleep'][0] if sleep_series['sleep'] && sleep_series['sleep'][0]
   end
 
+  def heart_info
+    heart_series['info']
+  end
+
+  def heart_data
+    heart_series['dataset']
+  end
+
   def time_in_bed
     sleep['timeInBed']
   end
@@ -49,6 +57,26 @@ class Datum < ActiveRecord::Base
       val << element['value'].to_i
     end
     val
+  end
+
+  def end_time
+    minute_data.last['dateTime']
+  end
+
+  def hr_during_sleep
+    start = heart_data.index(heart_data.find { |time| time['time'].to_time.strftime('%I:%M') == self.start_time.to_time.strftime('%I:%M') })
+    endt  = heart_data.index(heart_data.find { |time| time['time'].to_time.strftime('%I:%M') == self.end_time.to_time.strftime('%I:%M') })
+    heart_data[start..endt]
+  end
+
+  def main_data
+    main_array = []
+    hr_during_sleep.each do |point|
+      # main_array = [ time, heartrate, movement ]
+      sleep = minute_data.find { |time| time['dateTime'].to_time.strftime('%I:%M') == point['time'].to_time.strftime('%I:%M') }
+      main_array << [ point['time'], point['value'], sleep['value'] ]
+    end
+    main_array
   end
 
 end

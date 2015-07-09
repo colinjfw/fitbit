@@ -6,9 +6,9 @@ class User < ActiveRecord::Base
   end
 
   def process_heart_data(json1, json2)
-    values1 = json1['activities-heart-intraday']['dataset'].map{ |a| a.values[1] }
-    values2 = json2['activities-heart-intraday']['dataset'].map{ |a| a.values[1] }
-    values = values1 + values2
+    values1 = json1['activities-heart-intraday']['dataset']
+    values2 = json2['activities-heart-intraday']['dataset']
+    values = values1 +  values2
     data = {
       info: {
         interval: json1['activities-heart-intraday']['datasetInterval'],
