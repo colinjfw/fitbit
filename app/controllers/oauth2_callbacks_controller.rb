@@ -6,13 +6,15 @@ class Oauth2CallbacksController < ApplicationController
       user.update!(
         refresh_token:  fitbit_user.refresh_token,
         access_token:   fitbit_user.access_token,
-        name:           fitbit_user.full_name
+        name:           fitbit_user.full_name,
+        expiry:         Time.now + fitbit_user.expires_every
       )
     else
       user = User.create!(
         refresh_token:  fitbit_user.refresh_token,
         access_token:   fitbit_user.access_token,
-        name:           fitbit_user.full_name
+        name:           fitbit_user.full_name,
+        expiry:         Time.now + fitbit_user.expires_every
       )
     end
     log_in(user)

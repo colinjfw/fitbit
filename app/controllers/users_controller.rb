@@ -51,6 +51,12 @@ class UsersController < ApplicationController
       end
     end
 
+    def not_expired
+      if Time.now >= current_user.expiry
+        redirect_to Oauth2Rails::Auth.new.authorize_url
+      end
+    end
+
     def login_again
       redirect_to Oauth2Rails::Auth.new.authorize_url
     end
