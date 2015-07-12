@@ -89,10 +89,9 @@ module Analyzer
       vol && avg && acc # && var
     end
     def analyze
-      Rails.logger.info 'Analyzing in HrData'
+      Rails.logger.info "ANALYZER: Analyze #{ana = Time.now; ana}"
       stages = []
       heart.each_with_index do |datum, t|
-        Rails.logger.info "#{t} Analyzing sleep"
         if    rem?(t)     ; stages << 4
         elsif deep?(t)    ; stages << 3
         elsif medium?(t)  ; stages << 2
@@ -100,7 +99,9 @@ module Analyzer
         else              ; stages << 0
         end
       end
-      @dat_o.stage = stages ; @dat_o
+      Rails.logger.info "ANALYZER: Analyze end #{Time.now - ana}"
+      @dat_o.stage = stages
+      @dat_o
     end
   end
 

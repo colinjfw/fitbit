@@ -9,21 +9,22 @@ class User < ActiveRecord::Base
   def get_data(date)
     data = self.data.find_by(date: date)
     if data.nil?
-      logger.info "About to call GatherData #{start = Time.now ; start}"
-      data = GatherData.build(self, date)
-      logger.info "Finished calling GatherData #{Time.now - start}"
-      Datum.create!(
+      logger.info "START GATHER DATA #{start = Time.now ; start}"
+      new_data = GatherData.build(self, date)
+      built_data = Datum.create!(
         user_id: self.id,
         date: date,
-        start_time:         data.start_time,
-        min_in_bed:         data.sleep_info[:min_in_bed],
-        min_awake:          data.sleep_info[:min_awake],
-        min_asleep:         data.sleep_info[:min_asleep],
-        min_fall_asleep:    data.sleep_info[:min_fall_asleep],
-        min_restless:       data.sleep_info[:min_restless],
-        series:             data.main_array,
-        heart_rate_zones:   data.heart_zones
+        start_time:         new_data.start_time,
+        min_in_bed:         new_data.sleep_info[:min_in_bed],
+        min_awake:          new_data.sleep_info[:min_awake],
+        min_asleep:         new_data.sleep_info[:min_asleep],
+        min_fall_asleep:    new_data.sleep_info[:min_fall_asleep],
+        min_restless:       new_data.sleep_info[:min_restless],
+        series:             new_data.main_array,
+        heart_rate_zones:   new_data.heart_zones
       )
+      logger.info "END GATHER DATA #{Time.now - start}"
+      built_data
     else
       data
     end
