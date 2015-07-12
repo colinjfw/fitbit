@@ -3,26 +3,31 @@ class UsersController < ApplicationController
   rescue_from Oauth2Rails::Errors::Unauthorized, with: :login_again
 
   def show
-    logger.info 'test go to show'
     @user = User.find(params[:id])
-    if params[:date]
-      begin
-        @data = @user.get_data(params[:date])
-      rescue FitbitData::NoDataError
-        @data = false
-      end
-    end
   end
 
   def chart
-    logger.info params
-    @user = User.find(params[:id])
+    user = User.find(params[:id])
     begin
-      @data = @user.get_data(params[:date])
+      data = user.get_data(params[:date])
     rescue FitbitData::NoDataError
-      @data = false
+      data = false
     end
-    render layout: false
+    if data
+      respond_to { |format| format.json  { render json: data.data(current_user) } }
+    else
+      respond_to { |format| format.json  { render json: { noData: 'No sleep data found for today!' } } }
+    end
+  end
+
+  def analyze
+    user = User.find(params[:id])
+    if Datum.exists?(date: params[:date])
+      data = user.re_analyze_data(params[:date])
+      respond_to { |format| format.json  { render json: data.data(current_user) } }
+    else
+      respond_to { |format| format.json  { render json: { noData: 'No sleep data found for today!' } } }
+    end
   end
 
   def destroy

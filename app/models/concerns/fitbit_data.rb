@@ -21,8 +21,9 @@ module FitbitData
     end
 
     def call_sleep
-      Rails.logger.info "DATA: Call sleep #{cs = Time.now ; cs}"
+      User.fitbit_logger.info "DATA: Call sleep" ; cs = Time.now
       sleep = @user.fitbit.sleep(@date).json_body
+      User.fitbit_logger_json.info "\n\n\n\n\n\n\n\n------SLEEP SERIES RESULT-----\n#{sleep}"
       if sleep['sleep'][0]
         @sleep_series = sleep['sleep'][0]['minuteData']
         sleep_info    = sleep['sleep'][0]
@@ -32,9 +33,11 @@ module FitbitData
           min_asleep: sleep_info['minutesAsleep'].to_i,
           min_fall_asleep: sleep_info['minutesToFallAsleep'].to_i,
         }
-        @start_time = Time.parse("#{@date} #{sleep_info['startTime'].to_time.strftime('%H:%M')}")
+        @start_time = sleep_info['startTime'].to_time
+        User.fitbit_logger.info "DATA: start time before parsed #{sleep_info['startTime']}"
+        User.fitbit_logger.info "DATA: start time after parsed  #{sleep_info['startTime'].to_time}"
         @end_time   = Time.parse("#{@date} #{@sleep_series.last['dateTime']}")
-        Rails.logger.info "DATA: Call sleep end #{cs - Time.now}"
+        User.fitbit_logger.info "DATA: Call sleep end       #{Time.now - cs}"
       else
         raise NoDataError, 'Could not find any sleep data'
       end
@@ -49,8 +52,11 @@ module FitbitData
     end
 
     def call_heart
-      Rails.logger.info "DATA: Call heart #{ch = Time.now; ch}"
-      if @start_time < '00:00'
+      User.fitbit_logger.info "DATA: Call heart" ; ch = Time.now
+      User.fitbit_logger.info "API CALL: start time                         = #{strf_start}"
+      User.fitbit_logger.info "API CALL: end time                           = #{strf_end}"
+      User.fitbit_logger.info "API CALL: @start_time.day != @end_time.day   = #{@start_time.day != @end_time.day}"
+      if @start_time.day != @end_time.day
         heart1 = @user.fitbit.minute_heart(1,1,@date,strf_start,'23:59').json_body
         heart2 = @user.fitbit.minute_heart(1,1,@date.to_date + 1,'00:00',strf_end).json_body
         @heart_series = heart1['activities-heart-intraday']['dataset'] + heart2['activities-heart-intraday']['dataset']
@@ -58,9 +64,14 @@ module FitbitData
         heart1 = @user.fitbit.minute_heart(1,1,@date,strf_start,strf_end).json_body
         @heart_series = heart1['activities-heart-intraday']['dataset']
       end
+      User.fitbit_logger_json.info "\n\n\n------HEART SERIES RESULT-----\n#{heart1}\n\n\n\n\n\n\n#{heart2 if heart2}"
       hzone = heart1['activities-heart'][0]['heartRateZones']
-      Rails.logger.info "DATA: Call heart end #{ch - Time.now}"
+      User.fitbit_logger.info "DATA: Call heart end       #{Time.now - ch}"
+      User.fitbit_logger.info "API CALL: start time from heart series       = #{@heart_series.first['time']}"
+      User.fitbit_logger.info "API CALL: end time from heart series         = #{@heart_series.last['time']}"
+      resting = @user.fitbit.daily_heart(@date).json_body['activities-heart'][0]['value']['restingHeartRate']
       @heart_zones = {
+        resting: resting,
         fat_burn: { max: hzone[1]['max'], min: hzone[1]['min'] },
         cardio:   { max: hzone[2]['max'], min: hzone[2]['min'] },
         peak:     { max: hzone[3]['max'], min: hzone[3]['min'] }
@@ -72,39 +83,46 @@ module FitbitData
     end
 
     def build_main_array
-      Rails.logger.info "DATA: Build main array #{bm = Time.now ; bm}"
-      analyzed = call_analyzer
+      User.fitbit_logger.info "DATA: Build main array" ; bm = Time.now
+      call_analyzer
       @heart_series.each_with_index do |val, t|
-        Rails.logger.info "#{t} inside main array"
+        Rails.logger.info "#{t} build main array"
         @main_array << [
-          @data_time[t],                   # time
-          @data_heart[t],                  # heart rate
-          @data_accel[t],                  # accel data
-          analyzed[:stages][t],            # stages
-          analyzed[:moving_average][t],    # moving average
-          analyzed[:fixed_average][t],     # fixed average
-          analyzed[:moving_volatility][t]  # moving vol
+          @data_time[t],         # time
+          @data_heart[t],        # heart rate
+          @data_accel[t],        # accel data
+          @stages[t],            # stages
+          @moving_average[t],    # moving average
+          @fixed_average[t],     # fixed average
+          @moving_volatility[t]  # moving vol
         ]
       end
-      Rails.logger.info "DATA: Build main array end #{bm - Time.now}"
+      User.fitbit_logger.info "DATA: Build main array end #{Time.now - bm}"
     end
 
     def build_data_values
-      Rails.logger.info "DATA: Build data value #{dv = Time.now; dv}"
+      User.fitbit_logger.info "DATA: Build data value" ; dv = Time.now
       structure = sleep_structure
       @heart_series.each_with_index do |val, t|
+        Rails.logger.info "#{t} build data values loop"
         time = val['time'].to_time.strftime('%H:%M')
         @data_time << time
         @data_heart << val['value']
         @data_accel << structure[time] ? structure[time].to_i : 0
       end
-      Rails.logger.info "DATA: Build data value end #{dv - Time.now}"
+      User.fitbit_logger.info "DATA: Build data value end #{Time.now - dv}"
     end
 
     def call_analyzer
       data = Analyzer::HrData.analyze_data(heart: data_heart, accel: data_accel)
-      { moving_average: data.moving_average, fixed_average: data.fixed_average,
-        moving_volatility: data.moving_volatility, stages: data.stage }
+      @moving_average = data.moving_average
+      @fixed_average = data.fixed_average
+      @moving_volatility = data.moving_volatility
+      @stages = data.stage
+    end
+
+    def log_results
+      User.fitbit_logger_json.info "------HEART SERIES RESULT-----\n#{@heart_series}"
     end
 
     def self.build(user, date)

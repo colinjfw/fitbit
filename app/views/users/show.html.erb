@@ -17,9 +17,7 @@
 					</div>
 				<% end %>
 				<h3 class="center-block" style="text-align: center;"><%= params[:date] ? params[:date].to_date.strftime('%A %B %-d'): 'Select a date' %></h3>
-
-				<h6 style="text-align: center;">(the day you woke up on)</h6>
-				<h5 style="text-align: center;"><%= link_to 'Today', user_path(@user, date: Date.today) %></h5>
+				<h5 style="text-align: center;"><%= link_to 'Go to Today', user_path(@user, date: Date.today - 1) %></h5>
 			</div>
 			<div class="col-md-4 col-sm-4"><%= params[:date] ? link_to('Tomorrow', user_path(@user, date: params[:date].to_date + 1), class: 'btn btn-default center-block') : link_to('Tomorrow', user_path(@user, date: Date.today + 1), class: 'btn btn-default center-block')  %></div>
 		</div>
@@ -28,61 +26,253 @@
 		<br />
 
 <% if params[:date] %>
-
-		<div id="chart">
-			<div id="loader" style="width:50px;margin:auto"><div class="spinner"></div></div>
-			<script id="oldSeries">
-				var series = []
-			</script>
+		<div class="row">
+			<div class="col-md-2 col-xs-4">
+				<div class="thumbnail" style="background-color: #a8dcff">
+					<h2 style="text-align: center;"><span id="averageSleep"></span>h</h2>
+					<h5>Average Sleep</h5>
+				</div>
+			</div>
+			<div class="col-md-2 col-xs-4">
+				<div class="thumbnail" style="background-color: #a8dcff">
+					<h2 style="text-align: center;"><span id="startTime"></span></h2>
+					<h5>Start Time</h5>
+				</div>
+			</div>
+			<div class="col-md-2 col-xs-4">
+				<div class="thumbnail" style="background-color: #a8dcff">
+					<h2 style="text-align: center;"><span id="timeInBed"></span>h</h2>
+					<h5>Time in Bed</h5>
+				</div>
+			</div>
+			<div class="col-md-2 col-xs-4">
+				<div class="thumbnail" style="background-color: #a8dcff">
+					<h2 style="text-align: center;"><span id="timeAsleep"></span>h</h2>
+					<h5>Time Asleep</h5>
+				</div>
+			</div>
+			<div class="col-md-2 col-xs-4">
+				<div class="thumbnail" style="background-color: #a8dcff">
+					<h2 style="text-align: center;"><span id="efficiency"></span>%</h2>
+					<h5>Sleep Efficiency</h5>
+				</div>
+			</div>
+			<div class="col-md-2 col-xs-4">
+				<div class="thumbnail" style="background-color: #a8dcff">
+					<h2 style="text-align: center;"><span id="timeAwake"></span>min</h2>
+					<h5>Time Awake</h5>
+				</div>
+			</div>
+		</div>
+		<hr>
+		<div><h1 id="noData" style="text-align: center;"></h1></div>
+		<div style="margin:auto;width:100px;">
+			<div id="loader" style="z-index:20;width:auto;height:auto;background-color:#eee;position:fixed;top:0;padding:1em;opacity:0.6;border-radius:10px;"><div style="padding:0;margin:0;" class="spinner"></div></div>
 		</div>
 
-		<div id="chartDiv"></div>
-</div>
+		<button id="reAnalyze" class="btn btn-default">Re Analyze Data</button>
 
-	<script>
-		$( document ).ready(function() {
-				console.log( "ready!" );
-				var ajax = $.ajax({
-						url: "/users/chart",
+		<div id="heartChart"></div>
+		<div id="sleepChart"></div>
+		<div id="volatChart"></div>
+
+
+		<script>
+			$.ajax({
+				url: "/users/chart",
+				data: {id: "<%= @user.id %>", date: "<%= params[:date] %>"},
+				cache: true,
+				error: function () {
+					console.log( "error" );
+				},
+				complete: function (html) {
+					console.log( "complete" );
+					$("#loader").fadeOut();
+				}
+			}).done(function(data) {
+				$('#timeAwake').text(data['timeAwake']);
+				$('#efficiency').text(data['efficiency']);
+				$('#timeAsleep').text(data['timeAsleep']);
+				$('#timeInBed').text(data['timeInBed']);
+				$('#startTime').text(data['startTime']);
+				$('#noData').text(data['noData']);
+				$('#averageSleep').text(data['averageSleep']);
+				zingchart.exec('heartChart', 'setdata', { data: chartData(data['heartSeries'],data['xAxis'],"40:100:10")} );
+				zingchart.exec('sleepChart', 'setdata', { data: chartData(data['sleepSeries'],data['xAxis'],["", "Light","Medium","Deep","REM"])} );
+				zingchart.exec('volatChart', 'setdata', { data: chartData(data['volatSeries'],data['xAxis'],"0:12:1")} );
+			});
+
+			$(document).ready(function() {
+				$('#reAnalyze').click(function() {
+					$("#loader").fadeIn();
+					$.ajax({
+						url: "/users/analyze",
 						data: {id: "<%= @user.id %>", date: "<%= params[:date] %>"},
 						cache: true,
-						success: function (html) {
-							console.log( "success" );
-						},
 						error: function () {
-							console.log( "error" );
+							console.log( "error with reload" );
 						},
-						complete: function (html) {
-							console.log( "complete" );
-							$("#loader").remove();
+						success: function() {
+							console.log('reload sent')
 						}
+					}).done(function(data) {
+						console.log('reload done');
+						$("#loader").fadeOut();
+						zingchart.exec('heartChart', 'setdata', { data: chartData(data['heartSeries'],data['xAxis'],"40:100:10")} );
+						zingchart.exec('sleepChart', 'setdata', { data: chartData(data['sleepSeries'],data['xAxis'],["", "Light","Medium","Deep","REM"])} );
+						zingchart.exec('volatChart', 'setdata', { data: chartData(data['volatSeries'],data['xAxis'],"0:12:1")} );
+					});
 				});
-		});
-		$( document ).ajaxComplete(function( event, xhr, settings ) {
-			console.log(xhr.responseText);
-			$("#chart").append(xhr.responseText);
-			zingchart.exec('chartDiv', 'appendseriesdata', { data: newSeries })
-		});
-
-		var chartData={
-			"type": "line",
-			"scale-y":{
-				values:"0:120:10"
-			},
-			"plotarea":{
-				"background-color":"#fff"
-			},
-			"series": series
-		};
-
-		window.onload=function(){
-			zingchart.render({
-				id:'chartDiv',
-				height:500,
-				width:"100%",
-				data:chartData
 			});
-		};
 
-	</script>
+			var heartSeries = [];
+			var timeSeries = [];
+			var yScale = [];
+
+			function chartData(series,timeSeries,yScale,line) {
+				return {
+					"graphset": [
+						{
+							"type": "area",
+							"background-color": "#fff",
+							"utc": false,
+							"plotarea": {
+								"margin": "15% 5% 10% 5%",
+								"background-color": "#fff"
+							},
+							"legend": {
+								"layout": "float",
+								"background-color": "none",
+								"border-width": 0,
+								"shadow": 0,
+								"width": "100%",
+								"text-align": "middle",
+								"x": "5%",
+								"y": "5",
+								"item": {
+									"font-color": "#000",
+									"font-size": "14px"
+								}
+							},
+							"scale-x": {
+								"shadow": 0,
+								"tick": {
+									"line-color": "#000"
+								},
+								"guide": {
+									"line-color": "#fff"
+								},
+								"item": {
+									"font-color": "#000"
+								},
+								"minor-ticks": 0,
+								values: timeSeries,
+							},
+							"scale-y": {
+								"values": yScale,
+								"line-color": "#000",
+								"shadow": 0,
+								"tick": {
+									"line-color": "#000"
+								},
+								"item": {
+									"font-color": "#000"
+								}
+							},
+							"crosshair-x": {
+								"line-color": "#000",
+								"value-label": {
+									"border-radius": "5px",
+									"border-width": "1px",
+									"border-color": "#f6f7f8",
+									"padding": "5px",
+									"font-weight": "bold"
+								},
+								"scale-label": {
+									"font-color": "#000",
+									"background-color": "#f6f7f8"
+								}
+							},
+							"tooltip": {
+								"visible": false
+							},
+							"plot": {
+								"tooltip-text": "%t views: %v<br>%k",
+								"shadow": 0,
+								"line-width": "3px",
+								"marker": {
+									"type": "circle",
+									"size": 3
+								},
+								"hover-marker": {
+									"type": "circle",
+									"size": 4,
+									"border-width": "1px"
+								}
+							},
+							"series": series
+						}
+					]
+				};
+			}
+
+			zingchart.render({
+				id:'heartChart',
+				height:400,
+				width:"100%",
+				data: chartData(
+								heartSeries,
+								"",
+								"",
+								"line"
+				)
+			});
+			zingchart.render({
+				id:'sleepChart',
+				height:200,
+				width:"100%",
+				data: chartData(
+								heartSeries,
+								"",
+								"",
+								"line"
+				)
+			});
+			zingchart.render({
+				id:'volatChart',
+				height:200,
+				width:"100%",
+				data: chartData(
+								heartSeries,
+								"",
+								"",
+								"line"
+				)
+			});
+		</script>
+
+<% else %>
+	<h1 style="text-align: center;">No Date Selected</h1>
 <% end %>
+
+	<h2>About the sleep algorithm</h2>
+	<ul>
+		<li>
+			<strong>Rem Sleep</strong>
+			Rapid eye movement sleep is characterized by having a higher than normal heart rate, but not overly high, and
+			not as much movement, relatively speaking.
+		</li>
+		<li>
+			<strong>Deep Sleep</strong>
+			Deep sleep is characterized by a low heart rate, low volatility of the heart rate, and no movement.
+		</li>
+		<li>
+			<strong>Light Sleep</strong>
+			Light sleep is characterized by movement on the accelerometer, indicating you are moving around.
+		</li>
+		<li>
+			<strong>Awake</strong>
+			Wakefulness is indicated by a high heart rate and lots of movement.
+		</li>
+	</ul>
+</div>

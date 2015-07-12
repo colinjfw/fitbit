@@ -2,6 +2,18 @@ class User < ActiveRecord::Base
   has_many :data, dependent: :destroy
   include FitbitData
 
+  def self.fitbit_logger
+    @@fitbit_logger ||= Logger.new("#{Rails.root}/log/fitbit.log")
+  end
+
+  def self.fitbit_logger_json
+    @@fitbit_logger_json ||= Logger.new("#{Rails.root}/log/fitbit_json.log")
+  end
+
+  def self.iterations_logger
+    @@iterations_logger ||= Logger.new("#{Rails.root}/log/iterations.log")
+  end
+
   def fitbit(options = {})
     Oauth2Rails::Fitbit.new(self, options)
   end
@@ -9,7 +21,7 @@ class User < ActiveRecord::Base
   def get_data(date)
     data = self.data.find_by(date: date)
     if data.nil?
-      logger.info "START GATHER DATA #{start = Time.now ; start}"
+      User.fitbit_logger.info "START GATHER DATA #{start = Time.now ; start}"
       new_data = GatherData.build(self, date)
       built_data = Datum.create!(
         user_id: self.id,
@@ -23,11 +35,26 @@ class User < ActiveRecord::Base
         series:             new_data.main_array,
         heart_rate_zones:   new_data.heart_zones
       )
-      logger.info "END GATHER DATA #{Time.now - start}"
+      User.fitbit_logger.info "END GATHER DATA #{Time.now - start}"
+      User.fitbit_logger.info "DATA: start time after db   #{built_data.start_time}"
       built_data
     else
       data
     end
+  end
+
+  def re_analyze_data(date)
+    data = self.data.find_by(date: date)
+    analyzed_data = Analyzer::HrData.analyze_data(heart: data.data_heart, accel: data.data_accel)
+    series = data.series ; stages = analyzed_data.stage
+    series.each_with_index do |val, t|
+      series[t][3] = stages[t]
+    end
+    updated = data.update(
+      user_id: self.id,
+      series: series,
+    )
+    self.data.find_by(date: date)
   end
 
   def average_nightly_sleep

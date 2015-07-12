@@ -39,7 +39,6 @@ module Analyzer
       hr_vol
     end
     def self.analyze_data(options = {})
-      Rails.logger.info 'Calling HrData'
       data = self.new(options)
       Analyze.new(data).analyze
     end
@@ -55,7 +54,7 @@ module Analyzer
       @sample_size = @heart.size
     end
     def rem?(t)
-      if t < @sample_size * 0.20 || t > @sample_size * 0.10
+      if t > @sample_size * 0.2
         mov = moving(t)
         mov.average > heart.average ? avg = true : avg = false
         # mov.volatility > heart.volatility ? vol = true : vol = false
@@ -89,9 +88,10 @@ module Analyzer
       vol && avg && acc # && var
     end
     def analyze
-      Rails.logger.info "ANALYZER: Analyze #{ana = Time.now; ana}"
+      User.fitbit_logger.info "ANALYZER: Analyze" ; ana = Time.now
       stages = []
       heart.each_with_index do |datum, t|
+        Rails.logger.info "#{t} analyzer loop"
         if    rem?(t)     ; stages << 4
         elsif deep?(t)    ; stages << 3
         elsif medium?(t)  ; stages << 2
@@ -99,7 +99,7 @@ module Analyzer
         else              ; stages << 0
         end
       end
-      Rails.logger.info "ANALYZER: Analyze end #{Time.now - ana}"
+      User.fitbit_logger.info "ANALYZER: Analyze end      #{Time.now - ana}"
       @dat_o.stage = stages
       @dat_o
     end

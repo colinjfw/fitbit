@@ -1,0 +1,1 @@
+HttpLog.options[:logger] = Logger.new("#{Rails.root}/log/http.log")
