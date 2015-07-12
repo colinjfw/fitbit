@@ -16,9 +16,9 @@ class UsersController < ApplicationController
 
   def chart
     logger.info params
-    @user = User.first #.find(params[:id])
+    @user = User.find(params[:id])
     begin
-      @data = @user.get_data(Date.today - 1)
+      @data = @user.get_data(params[:date])
     rescue FitbitData::NoDataError
       @data = false
     end
@@ -47,7 +47,7 @@ class UsersController < ApplicationController
     end
 
     def login_again
-      redirect_to FitbitOauth2::Oauth2.new.authorize_url
+      redirect_to Oauth2Rails::Auth.new.authorize_url
     end
 
 end

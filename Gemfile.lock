@@ -1,5 +1,5 @@
 PATH
-  remote: /Users/ColinWalker/workspace/plugins/gems/oauth2_rails
+  remote: /Users/ColinWalker/workspace/ruby/gems/oauth2_rails
   specs:
     oauth2_rails (0.1.0)
       faraday (>= 0.7.0)

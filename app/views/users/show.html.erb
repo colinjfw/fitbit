@@ -27,7 +27,7 @@
 		<br />
 		<br />
 
-
+<% if params[:date] %>
 
 		<div id="chart">
 			<div id="loader" style="width:50px;margin:auto"><div class="spinner"></div></div>
@@ -44,7 +44,7 @@
 				console.log( "ready!" );
 				var ajax = $.ajax({
 						url: "/users/chart",
-						data: {id: '<%= @user.id %>', date: '<%= params[:date] %>'},
+						data: {id: "<%= @user.id %>", date: "<%= params[:date] %>"},
 						cache: true,
 						success: function (html) {
 							console.log( "success" );
@@ -85,3 +85,4 @@
 		};
 
 	</script>
+<% end %>
