@@ -1,7 +1,7 @@
 class CreateUsers < ActiveRecord::Migration
   def change
     create_table :users do |t|
-      t.integer :uid,           index: true
+      t.string  :uid,           index: true
       t.string  :refresh_token, index: true
       t.string  :access_token,  index: true
       t.string  :name
