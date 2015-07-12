@@ -11,6 +11,7 @@ class Oauth2CallbacksController < ApplicationController
       )
     else
       user = User.create!(
+        uid:            fitbit_user.id,
         refresh_token:  fitbit_user.refresh_token,
         access_token:   fitbit_user.access_token,
         name:           fitbit_user.full_name,

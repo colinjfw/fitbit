@@ -1,5 +1,6 @@
 class UsersController < ApplicationController
   before_action :correct_user
+  before_action :not_expired
   rescue_from Oauth2Rails::Errors::Unauthorized, with: :login_again
 
   def show
