@@ -16,6 +16,10 @@ class User < ActiveRecord::Base
     self.password_hash = @password
   end
 
+  def state
+    Base64.strict_encode64("#{csrf_token}:#{email}")
+  end
+
   def self.fitbit_logger
     @@fitbit_logger ||= Logger.new("#{Rails.root}/log/fitbit.log")
   end

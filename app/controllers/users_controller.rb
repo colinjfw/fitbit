@@ -8,7 +8,7 @@ class UsersController < ApplicationController
     user = User.find_by(email: params[:user][:email])
     if user
       if user.password == params[:user][:password]
-        redirect_to Oauth2Rails::Auth.new(state: user.email ).authorize_url
+        redirect_to Oauth2Rails::Auth.new(state: user.state ).authorize_url
       else
         flash[:danger] = 'Password was incorrect'
         redirect_to root_path
@@ -17,9 +17,10 @@ class UsersController < ApplicationController
       new_user = User.create(
         email:    params[:user][:email],
         password: params[:user][:password],
-        name:     params[:user][:name]
+        name:     params[:user][:name],
+        csrf_token: BCrypt::Password.create(SecureRandom.urlsafe_base64)
       )
-      redirect_to Oauth2Rails::Auth.new(state: new_user.email ).authorize_url
+      redirect_to Oauth2Rails::Auth.new(state: new_user.state ).authorize_url
     end
   end
 
