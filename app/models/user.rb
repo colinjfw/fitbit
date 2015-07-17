@@ -2,6 +2,15 @@ class User < ActiveRecord::Base
   has_many :data, dependent: :destroy
   include FitbitData
 
+  def password
+    @password ||= Password.new(password_hash)
+  end
+
+  def password=(new_password)
+    @password = Password.create(new_password)
+    self.password_digest = @password
+  end
+
   def self.fitbit_logger
     @@fitbit_logger ||= Logger.new("#{Rails.root}/log/fitbit.log")
   end

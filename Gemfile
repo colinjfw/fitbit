@@ -14,6 +14,7 @@ gem 'oauth2_rails', path: '/Users/ColinWalker/workspace/ruby/gems/oauth2_rails'
 gem 'faraday'
 gem 'bootstrap-sass'
 gem 'stat_sugar'
+gem 'bcrypt'
 
 group :development, :test do
   gem 'byebug'

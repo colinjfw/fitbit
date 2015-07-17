@@ -3,6 +3,21 @@ class UsersController < ApplicationController
   before_action :not_expired
   rescue_from Oauth2Rails::Errors::Unauthorized, with: :login_again
 
+  def create
+    user = User.find_by(email: params[:user][:email])
+    if user
+      if user.password == params[:user][:password]
+        redirect_to Oauth2Rails::Auth.new(state: user.email ).authorize_url
+      else
+        flash[:danger] = 'Password was incorrect'
+        redirect_to root_path
+      end
+    else
+      new_user = User.create(email: params[:user][:email], password: params[:user][:password] )
+      redirect_to Oauth2Rails::Auth.new(state: new_user.email ).authorize_url
+    end
+  end
+
   def show
     @user = User.find(params[:id])
   end

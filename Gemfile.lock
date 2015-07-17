@@ -177,6 +177,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  bcrypt
   better_errors
   binding_of_caller
   bootstrap-sass
