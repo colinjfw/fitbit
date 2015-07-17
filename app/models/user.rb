@@ -17,7 +17,7 @@ class User < ActiveRecord::Base
   end
 
   def state
-    Base64.strict_encode64("#{csrf_token}:#{email}")
+    Base64.strict_encode64("#{csrf_token}:#{id}")
   end
 
   def self.fitbit_logger

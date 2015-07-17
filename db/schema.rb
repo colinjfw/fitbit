@@ -41,6 +41,7 @@ ActiveRecord::Schema.define(version: 20150712204823) do
     t.string   "name"
     t.string   "email"
     t.string   "password_hash"
+    t.string   "csrf_token"
     t.datetime "created_at",    null: false
     t.datetime "updated_at",    null: false
     t.datetime "expiry"
