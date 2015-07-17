@@ -3,9 +3,10 @@
 	<h1 style="text-align: center; padding-top: 4em">Sleep Cycles for FitBit</h1>
 	<div style="width: 200px; margin: auto">
 		<%= form_for :user, url: users_path, method: :post do |f| %>
-			<%= f.text_field :email, class: 'form-control' %>
-			<%= f.password_field :password, class: 'form-control' %>
-			<%= f.submit 'Sign in with Fitbit', class: 'btn btn-lg btn-primary center-block' %>
+			<%= f.text_field :email, placeholder: 'email', class: 'form-control' %>
+			<%= f.text_field :name, placeholder: 'name', class: 'form-control' %>
+			<%= f.password_field :password, placeholder: 'password', class: 'form-control' %>
+			<%= f.submit 'Sign in with Fitbit', class: 'btn btn-primary center-block' %>
 		<% end %>
 	</div>
 </div>

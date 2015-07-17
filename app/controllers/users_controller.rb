@@ -1,6 +1,7 @@
 class UsersController < ApplicationController
-  before_action :correct_user
-  before_action :not_expired
+  include UsersControllerHelpers
+  before_action :correct_user,  except: [:create]
+  before_action :not_expired,   except: [:create]
   rescue_from Oauth2Rails::Errors::Unauthorized, with: :login_again
 
   def create
@@ -13,7 +14,11 @@ class UsersController < ApplicationController
         redirect_to root_path
       end
     else
-      new_user = User.create(email: params[:user][:email], password: params[:user][:password] )
+      new_user = User.create(
+        email:    params[:user][:email],
+        password: params[:user][:password],
+        name:     params[:user][:name]
+      )
       redirect_to Oauth2Rails::Auth.new(state: new_user.email ).authorize_url
     end
   end
@@ -55,26 +60,5 @@ class UsersController < ApplicationController
     logout if session[:user_id] == params[:id]
     redirect_to root_path
   end
-
-  private
-    def correct_user
-      if current_user
-        unless current_user.id == params[:id].to_i
-          redirect_to root_path
-        end
-      else
-        redirect_to root_path
-      end
-    end
-
-    def not_expired
-      if Time.now >= current_user.expiry
-        redirect_to Oauth2Rails::Auth.new.authorize_url
-      end
-    end
-
-    def login_again
-      redirect_to Oauth2Rails::Auth.new.authorize_url
-    end
 
 end
