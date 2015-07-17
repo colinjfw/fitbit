@@ -2,12 +2,17 @@ class User < ActiveRecord::Base
   has_many :data, dependent: :destroy
   include FitbitData
 
+  VALID_EMAIL_REGEX = /\A[\w+\-.]+@[a-z\-.]+\.[a-z]+\z/i
+  validates :email, presence: true, length: { maximum: 255 },
+            format: { with: VALID_EMAIL_REGEX },
+            uniqueness: { case_sensitive: false }
+
   def password
-    @password ||= Password.new(password_hash)
+    @password ||= BCrypt::Password.new(password_digest)
   end
 
   def password=(new_password)
-    @password = Password.create(new_password)
+    @password = BCrypt::Password.create(new_password)
     self.password_digest = @password
   end
 

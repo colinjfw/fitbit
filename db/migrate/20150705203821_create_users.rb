@@ -5,7 +5,7 @@ class CreateUsers < ActiveRecord::Migration
       t.string  :access_token,  index: true
       t.string  :name
       t.string  :email
-      t.string  :password_digest
+      t.string  :password_hash
 
       t.timestamps null: false
     end
