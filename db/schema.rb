@@ -36,11 +36,11 @@ ActiveRecord::Schema.define(version: 20150712204823) do
   add_index "data", ["user_id"], name: "index_data_on_user_id", using: :btree
 
   create_table "users", force: :cascade do |t|
-    t.integer  "uid"
     t.string   "refresh_token"
     t.string   "access_token"
     t.string   "name"
     t.string   "email"
+    t.string   "password_hash"
     t.datetime "created_at",    null: false
     t.datetime "updated_at",    null: false
     t.datetime "expiry"
@@ -48,7 +48,6 @@ ActiveRecord::Schema.define(version: 20150712204823) do
 
   add_index "users", ["access_token"], name: "index_users_on_access_token", using: :btree
   add_index "users", ["refresh_token"], name: "index_users_on_refresh_token", using: :btree
-  add_index "users", ["uid"], name: "index_users_on_uid", using: :btree
 
   add_foreign_key "data", "users"
 end
