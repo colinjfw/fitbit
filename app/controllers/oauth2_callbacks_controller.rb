@@ -12,7 +12,7 @@ class Oauth2CallbacksController < ApplicationController
       log_in(user)
       redirect_to user_path(user)
     else
-      flash[:danger] = "We've intercepted an attack, your data is safe."
+      flash[:danger] = "We've intercepted an attack, don't worry your data is safe."
       redirect_to root_path
     end
   end
