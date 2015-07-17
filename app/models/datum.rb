@@ -49,7 +49,7 @@ class Datum < ActiveRecord::Base
   end
 
   def test_rem_cutoff
-    cut = data_fixed_average[0] * 1.3 ; data = [] ; count = series.length
+    cut = data_fixed_average[0] * 1.1 ; data = [] ; count = series.length
     count.times { |a| data << cut }
     data
   end

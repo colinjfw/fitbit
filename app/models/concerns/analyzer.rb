@@ -2,8 +2,8 @@ module Analyzer
   module MovingAverage
     def moving(t)
       moving = [] ; down = t ; up = t
-      10.times { moving << heart[down]  if heart[down] ; down -= 1 }
-      10.times { moving << heart[up]    if heart[up] ; up += 1 }
+      20.times { moving << heart[down].to_f  if heart[down] ; down -= 1 }
+      20.times { moving << heart[up].to_f   if heart[up] ; up += 1 }
       moving
     end
   end
@@ -53,51 +53,17 @@ module Analyzer
       @accel = data_object.accel
       @sample_size = @heart.size
     end
-    def rem?(t)
-      if t > @sample_size * 0.2
-        mov = moving(t)
-        mov.average > heart.average ? avg = true : avg = false
-        # mov.volatility > heart.volatility ? vol = true : vol = false
-        # accel[t] > 1 ? acc = true : acc = false
-        # mov.variance > heart.variance ? var = true : var = false
-        avg
-      else
-        false
-      end
-    end
-    def deep?(t)
-      mov = moving(t)
-      mov.average < heart.average ? avg = true : avg = false
-      mov.volatility < heart.volatility ? vol = true : vol = false
-      # mov.variance < heart.variance ? var = true : var = false
-      vol && avg # && var
-    end
-    def medium?(t)
-      mov = moving(t)
-      mov.average.approx_equal?(heart.average) ? avg = true : avg = false
-      mov.volatility.approx_equal?(heart.volatility) ? vol = true : vol = false
-      # mov.variance.approx_equal?(heart.variance) ? var = true : var = false
-      vol && avg # && var
-    end
-    def light?(t)
-      mov = moving(t)
-      mov.average > heart.average ? avg = true : avg = false
-      mov.volatility.approx_equal?(heart.volatility) ? vol = true : vol = false
-      accel[t].to_i > 1 ? acc = true : acc = false
-      # mov.variance > heart.variance ? var = true : var = false
-      vol && avg && acc # && var
-    end
     def analyze
       User.fitbit_logger.info "ANALYZER: Analyze" ; ana = Time.now
-      stages = []
+      stages = [] ; avg = heart.average
       heart.each_with_index do |datum, t|
         Rails.logger.info "#{t} analyzer loop"
-        if    rem?(t)     ; stages << 4
-        elsif deep?(t)    ; stages << 3
-        elsif medium?(t)  ; stages << 2
-        elsif light?(t)   ; stages << 1
-        else              ; stages << 0
-        end
+        points = 0 ; mov = moving(t) ; mov_avg = mov.average
+        points += mov_avg * 0.01
+        points -= mov_avg * 0.1 if mov_avg >= avg * 1.1
+        points -= accel[t].to_f * 0.1
+        points += mov.volatility + 0.01
+        stages << points
       end
       User.fitbit_logger.info "ANALYZER: Analyze end      #{Time.now - ana}"
       @dat_o.stage = stages

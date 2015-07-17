@@ -98,7 +98,7 @@
 				$('#noData').text(data['noData']);
 				$('#averageSleep').text(data['averageSleep']);
 				zingchart.exec('heartChart', 'setdata', { data: chartData(data['heartSeries'],data['xAxis'],"40:100:10")} );
-				zingchart.exec('sleepChart', 'setdata', { data: chartData(data['sleepSeries'],data['xAxis'],["", "Light","Medium","Deep","REM"])} );
+				zingchart.exec('sleepChart', 'setdata', { data: chartData(data['sleepSeries'],data['xAxis'],["","Light","Medium","Deep","REM"])} );
 				zingchart.exec('volatChart', 'setdata', { data: chartData(data['volatSeries'],data['xAxis'],"0:12:1")} );
 			});
 
@@ -119,7 +119,7 @@
 						console.log('reload done');
 						$("#loader").fadeOut();
 						zingchart.exec('heartChart', 'setdata', { data: chartData(data['heartSeries'],data['xAxis'],"40:100:10")} );
-						zingchart.exec('sleepChart', 'setdata', { data: chartData(data['sleepSeries'],data['xAxis'],["", "Light","Medium","Deep","REM"])} );
+						zingchart.exec('sleepChart', 'setdata', { data: chartData(data['sleepSeries'],data['xAxis'],["","Light","Medium","Deep","REM"])} );
 						zingchart.exec('volatChart', 'setdata', { data: chartData(data['volatSeries'],data['xAxis'],"0:12:1")} );
 					});
 				});
