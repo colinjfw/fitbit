@@ -11,11 +11,11 @@ module UsersControllerHelpers
 
   def not_expired
     if Time.now >= current_user.expiry
-      redirect_to Oauth2Rails::Auth.new(state: current_user.email).authorize_url
+      redirect_to Oauth2Rails::Auth.new(state: current_user.state).authorize_url
     end
   end
 
   def login_again
-    redirect_to Oauth2Rails::Auth.new(state: current_user.email).authorize_url
+    redirect_to Oauth2Rails::Auth.new(state: current_user.state).authorize_url
   end
 end
