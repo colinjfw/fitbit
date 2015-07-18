@@ -7,6 +7,10 @@ class User < ActiveRecord::Base
             format: { with: VALID_EMAIL_REGEX },
             uniqueness: { case_sensitive: false }
 
+  def to_param
+    "#{id}-#{name.parameterize}"
+  end
+
   def password
     @password ||= BCrypt::Password.new(password_hash)
   end
