@@ -1,6 +1,6 @@
 class Oauth2CallbacksController < ApplicationController
   def fitbit
-    split = Base64.strict_decode64(params[:state]).split(':') ; csrf = split[0] ; id = split[1].to_i
+    split = Base64.decode64(params[:state]).split(':') ; csrf = split[0] ; id = split[1].to_i
     user = User.find(id)
     if user.csrf_token == BCrypt::Password.new(csrf)
       fitbit_user = Oauth2Rails::Auth.new.get_token(params[:code])

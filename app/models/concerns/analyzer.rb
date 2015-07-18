@@ -6,6 +6,12 @@ module Analyzer
       20.times { moving << heart[up].to_f   if heart[up] ; up += 1 }
       moving
     end
+    def moving_accel(t)
+      moving = [] ; down = t ; up = t
+      20.times { moving << accel[down].to_f  if accel[down] ; down -= 1 }
+      20.times { moving << accel[up].to_f   if accel[up] ; up += 1 }
+      moving
+    end
   end
 
   class HrData
@@ -57,13 +63,21 @@ module Analyzer
       User.fitbit_logger.info "ANALYZER: Analyze" ; ana = Time.now
       stages = [] ; avg = heart.average
       heart.each_with_index do |datum, t|
+        mov = moving(t) ; mov_avg = mov.average ; mov_accel = moving_accel(t)
+        if mov_accel.include?(2) or mov_accel.include?(3) # awake
+          stages << 0
+        elsif mov_avg > avg                               # rem or light
+          if stages[t - 5] >= 2                           # rem
+            stages << 3
+          else                                            # light
+            stages << 1
+          end
+        elsif mov_avg <= avg                              # deep
+          stages << 2
+        else                                              # can't find one
+          stages << 10
+        end
         Rails.logger.info "#{t} analyzer loop"
-        points = 0 ; mov = moving(t) ; mov_avg = mov.average
-        points += mov_avg * 0.01
-        points -= mov_avg * 0.1 if mov_avg >= avg * 1.1
-        points -= accel[t].to_f * 0.1
-        points += mov.volatility + 0.01
-        stages << points
       end
       User.fitbit_logger.info "ANALYZER: Analyze end      #{Time.now - ana}"
       @dat_o.stage = stages

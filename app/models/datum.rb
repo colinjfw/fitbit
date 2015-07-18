@@ -83,28 +83,6 @@ class Datum < ActiveRecord::Base
       ],
       sleepSeries: [
         {
-          values: data_accel,
-          "data-days": data_time,
-          "text": "Accelerometer",
-          "line-color": "#009872",
-          "alpha-area": 0,
-          "line-width": 1.5,
-          "legend-marker": {
-            "type": "circle",
-            "size": 5,
-            "background-color": "#009872",
-            "border-width": 1,
-            "shadow": 0,
-            "border-color": "#666"
-          },
-          "marker": {
-            "background-color": "#009872",
-            "border-width": 1,
-            "shadow": 0,
-            "border-color": "#69f2d0"
-          }
-        },
-        {
           values: data_stages,
           "data-days": data_time,
           "text": "Sleep Stages",
@@ -180,7 +158,7 @@ class Datum < ActiveRecord::Base
           "text": "Moving Average",
           "line-color": "#66CCFF",
           "alpha-area": 0,
-          "line-width": 1.5,
+          "line-width": 2,
           "legend-marker": {
             "type": "circle",
             "size": 5,
@@ -207,28 +185,6 @@ class Datum < ActiveRecord::Base
             "type": "circle",
             "size": 5,
             "background-color": "#666",
-            "border-width": 1,
-            "shadow": 0,
-            "border-color": "#666"
-          },
-          "marker": {
-            "background-color": "#da534d",
-            "border-width": 1,
-            "shadow": 0,
-            "border-color": "#faa39f"
-          }
-        },
-        {
-          values: test_rem_cutoff,
-          "data-days": data_time,
-          "text": "Rem Cutoff",
-          "line-color": "#CC0000",
-          "alpha-area": 0,
-          "line-width": 1,
-          "legend-marker": {
-            "type": "circle",
-            "size": 5,
-            "background-color": "#CC0000",
             "border-width": 1,
             "shadow": 0,
             "border-color": "#666"
