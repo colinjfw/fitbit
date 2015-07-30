@@ -9,7 +9,7 @@ gem 'jquery-rails'
 gem 'turbolinks'
 gem 'jbuilder',     '~> 2.0'
 gem 'sdoc',         '~> 0.4.0', group: :doc
-gem 'oauth2_rails', path: '/Users/ColinWalker/workspace/ruby/gems/oauth2_rails'
+gem 'oauth2_rails'
 gem 'faraday'
 gem 'bootstrap-sass'
 gem 'stat_sugar'
