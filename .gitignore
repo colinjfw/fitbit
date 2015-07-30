@@ -14,4 +14,4 @@
 
 .idea/
 
-/config/initializers/oauth2_rails
+config/initializers/oauth2_rails
