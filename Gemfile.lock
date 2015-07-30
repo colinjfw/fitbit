@@ -1,9 +1,3 @@
-PATH
-  remote: /Users/ColinWalker/workspace/ruby/gems/oauth2_rails
-  specs:
-    oauth2_rails (0.1.0)
-      faraday (>= 0.7.0)
-
 GEM
   remote: https://rubygems.org/
   specs:
@@ -109,6 +103,8 @@ GEM
     multipart-post (2.0.0)
     nokogiri (1.6.6.2)
       mini_portile (~> 0.6.0)
+    oauth2_rails (0.1.0)
+      faraday (>= 0.7.0)
     pg (0.18.2)
     rack (1.6.4)
     rack-test (0.6.3)
@@ -192,7 +188,7 @@ DEPENDENCIES
   httplog
   jbuilder (~> 2.0)
   jquery-rails
-  oauth2_rails!
+  oauth2_rails
   pg
   rails (= 4.2.3)
   require_reloader
