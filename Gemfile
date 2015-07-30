@@ -15,14 +15,18 @@ gem 'bootstrap-sass'
 gem 'stat_sugar'
 gem 'bcrypt'
 gem 'haml-rails'
+gem 'httplog'
 
 group :development, :test do
   gem 'byebug'
   gem 'web-console', '~> 2.0'
-  gem 'httplog'
   gem 'spring'
   gem 'require_reloader'
   gem 'better_errors'
   gem 'binding_of_caller'
 end
 
+group :production do
+  gem 'puma'
+  gem 'rails_12factor'
+end
