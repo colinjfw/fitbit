@@ -13,3 +13,5 @@
 /tmp
 
 .idea/
+
+/config/initializers/oauth2_rails
