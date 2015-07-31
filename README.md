@@ -5,7 +5,7 @@ This project depends on the gem at https://github.com/ColDog/oauth2-fitbit-rails
 View the project at: http://fitbit-colin.herokuapp.com/ (note you need a fitbit to do anything with it!)
 
 ## Screenshot
-![https://colin-w-info-uploads.s3.amazonaws.com/images/1436801431_shot-fitbit.png]
+![screenshot](https://colin-w-info-uploads.s3.amazonaws.com/images/1436801431_shot-fitbit.png)
 
 ## Riipen Answers
 ##### Why did you build this project? What Purpose does it serve? (300 words or less)
