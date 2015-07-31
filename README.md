@@ -4,6 +4,9 @@ This project depends on the gem at https://github.com/ColDog/oauth2-fitbit-rails
 
 View the project at: http://fitbit-colin.herokuapp.com/ (note you need a fitbit to do anything with it!)
 
+## Screenshot
+![https://colin-w-info-uploads.s3.amazonaws.com/images/1436801431_shot-fitbit.png]
+
 ## Riipen Answers
 ##### Why did you build this project? What Purpose does it serve? (300 words or less)
 I built this project to create a sleep cycle analyzer from my Fitbit data. I am very interested in the change in sleep patterns across people, and I think there is a lot you can tell from someone's sleep. Fitbit unfortunately does not calculate sleep cycles, but they do give second level heart rate data and accelerometer data for a person's sleep. This app combines this data and then applies an algorithm that I built to analyze a person's sleep. I hope to continue working on this project and promote it once I finalize the algorithm to help people understand their sleep cycles better.
