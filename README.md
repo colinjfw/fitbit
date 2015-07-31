@@ -1,6 +1,7 @@
 The goal of this project was to first practice hooking in to an external API using the Oauth2 protocol and to then learn to analyze my sleep cycle based on my heart rate.
 
 This project depends on the gem at https://github.com/ColDog/oauth2-fitbit-rails
+View the project at: http://fitbit-colin.herokuapp.com/ (note you need a fitbit to do anything with it!)
 
 ## Riipen Answers
 ##### Why did you build this project? What Purpose does it serve? (300 words or less)
